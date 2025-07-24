@@ -1,0 +1,20 @@
+# Python cache
+**/__pycache__/
+*.py[cod]
+
+# VSCode editor settings
+.vscode/
+
+# Logs
+**/logs/
+*.log
+
+# Runtime-generated data
+**/data/
+**/counters/
+**/registration_data/
+
+# Editor backup files (Ubuntu, Vim, Nano, etc.)
+*~
+*.swp
+*.bak

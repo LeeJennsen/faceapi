@@ -1,0 +1,49 @@
+services:
+  api:
+    build: .
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mongo:
+        condition: service_started
+    volumes:
+      - .:/app
+    stop_grace_period: 5s
+
+  mysql:
+    image: mysql:8
+    restart: always
+    healthcheck:
+     test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+     interval: 5s
+     timeout: 3s
+     retries: 3
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    stop_signal: SIGTERM
+    stop_grace_period: 5s
+
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    stop_signal: SIGTERM
+    stop_grace_period: 5s
+
+volumes:
+  mysql_data:
+  mongo_data:

@@ -1,0 +1,62 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyc
+*.pyd
+*.so
+
+# Editor/IDE files
+*.swp
+*.swo
+*.bak
+*.tmp
+.vscode/
+.idea/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Secrets and environment variables
+.env
+.env.*
+
+# Log files
+logs/
+*.log
+
+# Docker artifacts
+*.pid
+*.sock
+*.tar
+
+# Build artifacts (for future packaging)
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Flask specific
+instance/
+.webassets-cache/
+
+# Test & coverage tools
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# System junk
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Not used now but common in Flask projects
+migrations/
+.ipynb_checkpoints/

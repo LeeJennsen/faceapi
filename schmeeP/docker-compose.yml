@@ -1,0 +1,138 @@
+version: '3.8' # Retaining the latest version for compatibility
+
+# Define networks at the top level
+networks:
+  face-network:
+    driver: bridge
+
+# Define volumes at the top level
+volumes:
+  mysql_data: # Keep this volume definition, even if mysql_db service is removed. It doesn't hurt.
+  mosquitto_data:
+  mosquitto_logs:
+
+services:
+  # MySQL Database Service (REMOVED - now external at 10.0.1.140)
+  # The 'mysql_db' service block should be absent from here.
+
+  # MQTT Broker Service (RESTORED for internal communication)
+  mqtt:
+    image: eclipse-mosquitto:2.0
+    container_name: mqtt
+    ports:
+      - "1883:1883"
+      - "9001:9001" # For MQTT over WebSockets if needed
+    volumes:
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_logs:/mosquitto/log
+      - ./mosquitto.conf/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    healthcheck:
+      test: ["CMD", "mosquitto_sub", "-h", "localhost", "-t", "$$SYS/broker/uptime", "-C", "1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - face-network
+
+  # Face Data Subscriber Service
+  face-sub:
+    build:
+      context: ./face_md
+      dockerfile: Dockerfile
+    container_name: face-data-sub
+    restart: unless-stopped
+    depends_on:
+      mqtt:
+        condition: service_healthy # Depends on the unified MQTT service
+    command: python face-data-sub.py
+    volumes:
+      - ./face_md/data:/app/data
+      - ./face_md/logs:/app/logs
+    networks:
+      - face-network
+
+  # Face Data Publisher Service
+  face-pub:
+    build:
+      context: ./face_md
+      dockerfile: Dockerfile
+    container_name: face-data-pub
+    restart: unless-stopped
+    depends_on:
+      mqtt:
+        condition: service_healthy # Depends on the unified MQTT service
+      face-sub:
+        condition: service_started
+    command: python face-data-pub.py
+    volumes:
+      - ./face_md/counters:/app/counters
+      - ./face_md/logs:/app/logs
+    networks:
+      - face-network
+
+  # Live Match Engine Service
+  live_match_engine:
+    build:
+      context: ./face_pp
+      dockerfile: Dockerfile
+    container_name: live_match_engine
+    command: python live_match_engine.py
+    depends_on:
+      mqtt:
+        condition: service_healthy
+    volumes:
+      - ./face_pp:/app
+      - ./face_pp/logs:/app/logs
+    restart: always
+    networks:
+      - face-network
+
+  # Face Recognition Engine Service
+  face_engine:
+    build:
+      context: ./face_pp
+      dockerfile: Dockerfile
+    container_name: face_recognition_engine
+    command: python face_recognition_engine.py
+    depends_on:
+      mqtt:
+        condition: service_healthy
+    volumes:
+      - ./face_pp:/app
+    restart: always
+    networks:
+      - face-network
+
+  # Face Registration Batch Service
+  register_faces:
+    build:
+      context: ./face_pp
+      dockerfile: Dockerfile
+    container_name: register_batch_faces
+    command: python register_batch_faces.py
+    depends_on:
+      mqtt:
+        condition: service_healthy
+    volumes:
+      - ./face_pp:/app
+      - ./registration_data:/app/registration_data
+      - ./face_pp/logs:/app/logs
+    restart: "no"
+    networks:
+      - face-network
+
+  # Image Pusher Service
+  image_pusher:
+    build:
+      context: ./face_pp
+      dockerfile: Dockerfile
+    container_name: image_pusher
+    command: python image_pusher.py
+    depends_on:
+      mqtt:
+        condition: service_healthy
+    volumes:
+      - ./face_pp:/app
+    restart: "no"
+    networks:
+      - face-network

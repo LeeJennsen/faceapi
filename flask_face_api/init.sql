@@ -1,0 +1,48 @@
+CREATE DATABASE IF NOT EXISTS face_auth;
+USE face_auth;
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL DEFAULT 'Viewer',
+    last_login TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS otps (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(100) NOT NULL,
+    otp_code VARCHAR(255) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS face_persons (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  unique_id VARCHAR(255),
+  images_json LONGTEXT,
+  embedding LONGTEXT,
+  label VARCHAR(255),
+  created_at DATETIME
+);
+
+CREATE TABLE IF NOT EXISTS face_tracking (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  track_id VARCHAR(255) NOT NULL,
+  unique_id VARCHAR(255),
+  image_base64 LONGTEXT NOT NULL,
+  embedding BLOB NOT NULL,
+  timestamp DATETIME NOT NULL,
+  camera_id VARCHAR(255),
+  custom_track_key VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    actor_email VARCHAR(100) NOT NULL,
+    action VARCHAR(255) NOT NULL,
+    details TEXT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
