@@ -109,8 +109,9 @@ def save_received_data(data, folder="data"):
 # Function for forwarding face data to cloud API
 def forward_to_api(data):
     try:
-        #url = "http://localhost:5000/api/v1/faces" # Replace with real cloud API endpoint
-        url = "http://10.0.1.140:5000/api/v1/faces-mongo" # Real cloud API endpoint
+        #url = "http://localhost:5000/api/v1/faces-mongo" # Replace with real cloud API endpoint
+        url = "http://host.docker.internal:5000/api/v1/faces-mongo" # Replace with real cloud API endpoint
+        #url = "http://10.0.1.140:5000/api/v1/faces-mongo" # Real cloud API endpoint
         headers = {"Content-Type": "application/json"} # Specify that we're sending JSON
         response = requests.post(url, json=data)
         #headers = {"Authorization": f"Bearer {your_jwt_token}"} # Replace with real JWT credentials

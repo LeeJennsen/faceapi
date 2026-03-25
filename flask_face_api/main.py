@@ -27,9 +27,9 @@ app.register_blueprint(v1_ui_bp)
 api = Api(
     app,
     version='1.0',
-    title='GlueckTech AI API',
+    title='Jennsen API',
     doc='/docs',
-    description='A comprehensive API for the AI Dashboard',
+    description='Full shown API for the AI Dashboard',
     authorizations={
         'apikey': {
             'type': 'apiKey',

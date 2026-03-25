@@ -23,7 +23,8 @@ retry_delay = 5 # seconds
 for i in range(max_retries):
     try:
         print(f"[MQTT] Attempting to connect to MQTT broker from register_faces (attempt {i+1}/{max_retries})...")
-        mqtt_client.connect("10.0.1.140", 1883, 60)
+        mqtt_client.connect("mqtt", 1883, 60)
+        #mqtt_client.connect("10.0.1.140", 1883, 60)
         mqtt_connected = True
         print("[MQTT] Successfully connected to MQTT broker from register_faces.")
         break

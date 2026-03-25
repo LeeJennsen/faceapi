@@ -10,7 +10,9 @@ load_dotenv()
 
 def get_connection():
     return mysql.connector.connect(
-        host='10.0.1.140',
+        #host='10.0.1.140',
+        #host='localhost', 
+        host='host.docker.internal',
         port=3306,
         user='glueck',
         password='pass',  # replace with actual password

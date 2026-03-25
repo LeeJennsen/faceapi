@@ -73,7 +73,8 @@ def main():
     for i in range(max_retries):
         try:
             print(f"[MQTT] Attempting to connect to MQTT broker (attempt {i+1}/{max_retries})...")
-            client.connect('10.0.1.140', 1883, 60) # IMPORTANT: Changed 'mqtt' to 'mqtt_broker'
+            client.connect('mqtt', 1883, 60) # IMPORTANT: Changed 'mqtt' to 'mqtt_broker'
+            #client.connect('10.0.1.140', 1883, 60) # IMPORTANT: Changed 'mqtt' to 'mqtt_broker'
             mqtt_connected = True
             print("[MQTT] Successfully connected to MQTT broker.")
             break

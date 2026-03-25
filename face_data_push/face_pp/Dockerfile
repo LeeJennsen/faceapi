@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     liblapack-dev \
     libjpeg-dev \
     zlib1g-dev \
-    libgl1-mesa-glx \
+    libgl1 \
     libxkbcommon-x11-0 \
     libxcb-randr0 \
     libxcb-xinerama0 \
