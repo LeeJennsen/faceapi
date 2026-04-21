@@ -1,0 +1,69 @@
+{{- $configName := printf "%s-config" (include "faceapi2.fullname" .) -}}
+{{- $secretName := include "faceapi2.secretName" . -}}
+{{- if .Values.jobs.registerFaces.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "faceapi2.fullname" . }}-register-faces
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  backoffLimit: {{ .Values.jobs.registerFaces.backoffLimit }}
+  ttlSecondsAfterFinished: {{ .Values.jobs.registerFaces.ttlSecondsAfterFinished }}
+  template:
+    metadata:
+      labels:
+        app: register-faces
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: wait-for-mysql
+          image: "{{ .Values.images.busybox.repository }}:{{ .Values.images.busybox.tag }}"
+          imagePullPolicy: {{ .Values.images.busybox.pullPolicy }}
+          command: ["sh", "-c", "until nc -z mysql 3306; do echo waiting for mysql; sleep 3; done"]
+        - name: wait-for-mqtt
+          image: "{{ .Values.images.busybox.repository }}:{{ .Values.images.busybox.tag }}"
+          imagePullPolicy: {{ .Values.images.busybox.pullPolicy }}
+          command: ["sh", "-c", "until nc -z mqtt 1883; do echo waiting for mqtt; sleep 3; done"]
+      containers:
+        - name: register-faces
+          image: "{{ .Values.images.facePp.repository }}:{{ .Values.images.facePp.tag }}"
+          imagePullPolicy: {{ .Values.images.facePp.pullPolicy }}
+          command: ["python", "register_batch_faces.py"]
+          envFrom:
+            - configMapRef:
+                name: {{ $configName }}
+            - secretRef:
+                name: {{ $secretName }}
+{{- end }}
+{{- if .Values.jobs.imagePusher.enabled }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "faceapi2.fullname" . }}-image-pusher
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  backoffLimit: {{ .Values.jobs.imagePusher.backoffLimit }}
+  ttlSecondsAfterFinished: {{ .Values.jobs.imagePusher.ttlSecondsAfterFinished }}
+  template:
+    metadata:
+      labels:
+        app: image-pusher
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: wait-for-mqtt
+          image: "{{ .Values.images.busybox.repository }}:{{ .Values.images.busybox.tag }}"
+          imagePullPolicy: {{ .Values.images.busybox.pullPolicy }}
+          command: ["sh", "-c", "until nc -z mqtt 1883; do echo waiting for mqtt; sleep 3; done"]
+      containers:
+        - name: image-pusher
+          image: "{{ .Values.images.facePp.repository }}:{{ .Values.images.facePp.tag }}"
+          imagePullPolicy: {{ .Values.images.facePp.pullPolicy }}
+          command: ["python", "image_pusher.py"]
+          envFrom:
+            - configMapRef:
+                name: {{ $configName }}
+{{- end }}

@@ -1,14 +1,15 @@
-from app.db.mysql import get_mysql_connection
+from loguru import logger
+
+from app.db.mysql import mysql_cursor
+
 
 def log_activity(actor_email, action, details=""):
-    """Logs an activity to the audit_logs table."""
     try:
-        conn = get_mysql_connection()
-        cur = conn.cursor()
-        query = "INSERT INTO audit_logs (actor_email, action, details) VALUES (%s, %s, %s)"
-        cur.execute(query, (actor_email, action, details))
-        conn.commit()
-        cur.close()
-        conn.close()
-    except Exception as e:
-        print(f"Failed to log activity: {e}")
+        with mysql_cursor() as (conn, cursor):
+            cursor.execute(
+                "INSERT INTO audit_logs (actor_email, action, details) VALUES (%s, %s, %s)",
+                (actor_email, action, details),
+            )
+            conn.commit()
+    except Exception as exc:
+        logger.warning("Failed to persist audit log for {}: {}", actor_email, exc)

@@ -1,29 +1,39 @@
-from loguru import logger
-import os
 import sys
+from pathlib import Path
+
+from loguru import logger
+
+from app.config import Config
+
 
 def setup_logger():
-    # Remove default handlers (to avoid duplicates)
+    if getattr(setup_logger, "_configured", False):
+        return logger
+
     logger.remove()
 
-    # Set log level based on environment
-    log_level = "DEBUG" if os.getenv("FLASK_ENV") == "development" else "INFO"
-
-    # Log to stdout (good for Docker and dev)
-    logger.add(sys.stdout, level=log_level, format="{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}")
-
-    # Ensure logs directory exists
-    os.makedirs("logs", exist_ok=True)
-
-    # Log to file with rotation (keep logs small and fresh)
     logger.add(
-        "logs/app.log",
-        rotation="1 MB",           # Rotate when file > 1 MB
-        retention="7 days",        # Keep logs for 7 days
-        level="INFO",
-        serialize=False            # Set to True if using with log shipping tools like Fluent Bit
+        sys.stdout,
+        level=Config.LOG_LEVEL,
+        enqueue=True,
+        backtrace=False,
+        diagnose=False,
+        format="{time:YYYY-MM-DD HH:mm:ss} | {level:<8} | {name}:{function}:{line} | {message}",
     )
 
-    # Confirmation message on startup
-    logger.info("Logger initialized")
+    log_dir = Path(Config.LOG_DIR)
+    log_dir.mkdir(parents=True, exist_ok=True)
+    logger.add(
+        log_dir / "app.log",
+        level="INFO",
+        enqueue=True,
+        rotation="5 MB",
+        retention="14 days",
+        backtrace=False,
+        diagnose=False,
+        format="{time:YYYY-MM-DD HH:mm:ss} | {level:<8} | {name}:{function}:{line} | {message}",
+    )
 
+    setup_logger._configured = True
+    logger.info("Application logging configured at {} level", Config.LOG_LEVEL)
+    return logger

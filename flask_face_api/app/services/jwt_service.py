@@ -1,34 +1,47 @@
-import jwt, datetime
+from datetime import datetime, timedelta, timezone
+
+import jwt
+from loguru import logger
+
 from app.config import Config
 
+
 def generate_tokens(user_id: int):
-    at = jwt.encode({
-        'sub': str(user_id),
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=Config.JWT_EXPIRY_SECONDS)
-    }, Config.JWT_SECRET_KEY, algorithm='HS256')
+    now = datetime.now(timezone.utc)
+    access_token = jwt.encode(
+        {
+            "sub": str(user_id),
+            "type": "access",
+            "exp": now + timedelta(seconds=Config.JWT_EXPIRY_SECONDS),
+        },
+        Config.JWT_SECRET_KEY,
+        algorithm="HS256",
+    )
 
-    rt = jwt.encode({
-        'sub': str(user_id),
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=Config.JWT_REFRESH_EXPIRY_SECONDS)
-    }, Config.JWT_SECRET_KEY, algorithm='HS256')
+    refresh_token = jwt.encode(
+        {
+            "sub": str(user_id),
+            "type": "refresh",
+            "exp": now + timedelta(seconds=Config.JWT_REFRESH_EXPIRY_SECONDS),
+        },
+        Config.JWT_SECRET_KEY,
+        algorithm="HS256",
+    )
 
-    return at, rt
+    return access_token, refresh_token
 
 
 def verify_token(token: str):
     try:
         if not token:
-            print("No token provided")
+            logger.warning("Token verification attempted without a token.")
             return None
-        print("🔐 Using secret key to verify:", Config.JWT_SECRET_KEY)
-        payload = jwt.decode(token, Config.JWT_SECRET_KEY, algorithms=['HS256'])
-        print("✅ Token verified:", payload)
-        return payload['sub']
+
+        payload = jwt.decode(token, Config.JWT_SECRET_KEY, algorithms=["HS256"])
+        return payload["sub"]
     except jwt.ExpiredSignatureError:
-        print("❌ Token expired")
+        logger.info("Token verification failed: token expired.")
         return None
-    except jwt.InvalidTokenError as e:
-        print("❌ Invalid token:", e)
+    except jwt.InvalidTokenError as exc:
+        logger.warning("Token verification failed: {}", exc)
         return None
-
-

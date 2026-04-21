@@ -1,0 +1,53 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: faceapi2
+
+resources:
+  - namespace.yaml
+  - storage.yaml
+  - mysql.yaml
+  - mongo.yaml
+  - mqtt.yaml
+  - api.yaml
+  - face-md.yaml
+  - face-pp.yaml
+  - jobs.yaml
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: faceapi2
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+secretGenerator:
+  - name: faceapi2-secrets
+    envs:
+      - secret.env
+
+configMapGenerator:
+  - name: faceapi2-app-config
+    literals:
+      - FLASK_ENV=production
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=face_auth
+      - MONGO_URI=mongodb://mongo:27017/face_metadata
+      - JWT_EXPIRY_SECONDS=3600
+      - JWT_REFRESH_EXPIRY_SECONDS=604800
+      - SMTP_SERVER=smtpdm-ap-southeast-1.aliyun.com
+      - SMTP_PORT=465
+      - FROM_EMAIL=no-reply@servicemail.gluecktech.com
+      - FROM_NAME=Glueck Tech Team
+      - MQTT_HOST=mqtt
+      - MQTT_PORT=1883
+      - FACE_DATA_TOPIC=face/data/raw
+      - FACE_IMAGE_TOPIC=face/images/incoming
+      - FACE_API_BASE_URL=http://api:5000
+  - name: mysql-init
+    files:
+      - init.sql=init.sql
+  - name: mosquitto-config
+    files:
+      - mosquitto.conf=mosquitto.conf

@@ -9,9 +9,9 @@ from logging.handlers import RotatingFileHandler
 from datetime import datetime, timedelta
 
 # MQTT Broker
-broker = "mqtt" # For testing use this public broker
-port = 1883 # If want tls, use 8883 and need configuration
-topic = "face/data/raw"
+broker = os.getenv("MQTT_HOST", "mqtt")
+port = int(os.getenv("MQTT_PORT", "1883"))
+topic = os.getenv("FACE_DATA_TOPIC", "face/data/raw")
 
 os.makedirs("counters", exist_ok=True)
 

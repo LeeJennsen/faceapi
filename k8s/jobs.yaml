@@ -1,0 +1,65 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: register-faces
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        app: register-faces
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: wait-for-mysql
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - until nc -z mysql 3306; do echo waiting for mysql; sleep 3; done
+        - name: wait-for-mqtt
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - until nc -z mqtt 1883; do echo waiting for mqtt; sleep 3; done
+      containers:
+        - name: register-faces
+          image: faceapi2/face-pp:latest
+          imagePullPolicy: IfNotPresent
+          command: ["python", "register_batch_faces.py"]
+          envFrom:
+            - configMapRef:
+                name: faceapi2-app-config
+            - secretRef:
+                name: faceapi2-secrets
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: image-pusher
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        app: image-pusher
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: wait-for-mqtt
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - until nc -z mqtt 1883; do echo waiting for mqtt; sleep 3; done
+      containers:
+        - name: image-pusher
+          image: faceapi2/face-pp:latest
+          imagePullPolicy: IfNotPresent
+          command: ["python", "image_pusher.py"]
+          envFrom:
+            - configMapRef:
+                name: faceapi2-app-config

@@ -1,0 +1,112 @@
+{{- $full := include "faceapi2.fullname" . -}}
+{{- if .Values.persistence.mysql.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $full }}-mysql-data
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.persistence.mysql.size }}
+{{- end }}
+{{- if .Values.persistence.mongo.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $full }}-mongo-data
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.persistence.mongo.size }}
+{{- end }}
+{{- if .Values.persistence.mosquittoData.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $full }}-mosquitto-data
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.persistence.mosquittoData.size }}
+{{- end }}
+{{- if .Values.persistence.mosquittoLogs.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $full }}-mosquitto-logs
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.persistence.mosquittoLogs.size }}
+{{- end }}
+{{- if .Values.persistence.faceSubData.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $full }}-face-sub-data
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.persistence.faceSubData.size }}
+{{- end }}
+{{- if .Values.persistence.faceSubLogs.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $full }}-face-sub-logs
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.persistence.faceSubLogs.size }}
+{{- end }}
+{{- if .Values.persistence.facePubCounters.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $full }}-face-pub-counters
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.persistence.facePubCounters.size }}
+{{- end }}
+{{- if .Values.persistence.facePubLogs.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $full }}-face-pub-logs
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.persistence.facePubLogs.size }}
+{{- end }}

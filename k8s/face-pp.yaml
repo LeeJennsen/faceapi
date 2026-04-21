@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: live-match-engine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: live-match-engine
+  template:
+    metadata:
+      labels:
+        app: live-match-engine
+    spec:
+      containers:
+        - name: live-match-engine
+          image: faceapi2/face-pp:latest
+          imagePullPolicy: IfNotPresent
+          command: ["python", "live_match_engine.py"]
+          envFrom:
+            - configMapRef:
+                name: faceapi2-app-config
+            - secretRef:
+                name: faceapi2-secrets
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: face-recognition-engine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: face-recognition-engine
+  template:
+    metadata:
+      labels:
+        app: face-recognition-engine
+    spec:
+      containers:
+        - name: face-recognition-engine
+          image: faceapi2/face-pp:latest
+          imagePullPolicy: IfNotPresent
+          command: ["python", "face_recognition_engine.py"]
+          envFrom:
+            - configMapRef:
+                name: faceapi2-app-config
+            - secretRef:
+                name: faceapi2-secrets

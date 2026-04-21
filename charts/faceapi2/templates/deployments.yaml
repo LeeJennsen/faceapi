@@ -1,0 +1,361 @@
+{{- $configName := printf "%s-config" (include "faceapi2.fullname" .) -}}
+{{- $secretName := include "faceapi2.secretName" . -}}
+{{- $full := include "faceapi2.fullname" . -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $full }}-api
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount.api }}
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api
+          image: "{{ .Values.images.api.repository }}:{{ .Values.images.api.tag }}"
+          imagePullPolicy: {{ .Values.images.api.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.api.port }}
+              name: http
+          envFrom:
+            - configMapRef:
+                name: {{ $configName }}
+            - secretRef:
+                name: {{ $secretName }}
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.service.api.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.service.api.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 20
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $full }}-mysql
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount.mysql }}
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: "{{ .Values.images.mysql.repository }}:{{ .Values.images.mysql.tag }}"
+          imagePullPolicy: {{ .Values.images.mysql.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.mysql.port }}
+              name: mysql
+          env:
+            - name: MYSQL_DATABASE
+              value: {{ .Values.config.MYSQL_DATABASE | quote }}
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secretName }}
+                  key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secretName }}
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secretName }}
+                  key: MYSQL_PASSWORD
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+            - name: mysql-init
+              mountPath: /docker-entrypoint-initdb.d/init.sql
+              subPath: init.sql
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$MYSQL_ROOT_PASSWORD\""]
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["sh", "-c", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$MYSQL_ROOT_PASSWORD\""]
+            initialDelaySeconds: 45
+            periodSeconds: 20
+      volumes:
+        - name: mysql-data
+          {{- if .Values.persistence.mysql.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ $full }}-mysql-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: mysql-init
+          configMap:
+            name: {{ $full }}-mysql-init
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $full }}-mongo
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount.mongo }}
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+        - name: mongo
+          image: "{{ .Values.images.mongo.repository }}:{{ .Values.images.mongo.tag }}"
+          imagePullPolicy: {{ .Values.images.mongo.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.mongo.port }}
+              name: mongo
+          volumeMounts:
+            - name: mongo-data
+              mountPath: /data/db
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.service.mongo.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.service.mongo.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 20
+      volumes:
+        - name: mongo-data
+          {{- if .Values.persistence.mongo.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ $full }}-mongo-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $full }}-mqtt
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount.mqtt }}
+  selector:
+    matchLabels:
+      app: mqtt
+  template:
+    metadata:
+      labels:
+        app: mqtt
+    spec:
+      containers:
+        - name: mqtt
+          image: "{{ .Values.images.mqtt.repository }}:{{ .Values.images.mqtt.tag }}"
+          imagePullPolicy: {{ .Values.images.mqtt.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.mqtt.port }}
+              name: mqtt
+            - containerPort: {{ .Values.service.mqtt.websocketPort }}
+              name: mqtt-ws
+          volumeMounts:
+            - name: mosquitto-data
+              mountPath: /mosquitto/data
+            - name: mosquitto-logs
+              mountPath: /mosquitto/log
+            - name: mosquitto-config
+              mountPath: /mosquitto/config/mosquitto.conf
+              subPath: mosquitto.conf
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.service.mqtt.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.service.mqtt.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 20
+      volumes:
+        - name: mosquitto-data
+          {{- if .Values.persistence.mosquittoData.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ $full }}-mosquitto-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: mosquitto-logs
+          {{- if .Values.persistence.mosquittoLogs.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ $full }}-mosquitto-logs
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: mosquitto-config
+          configMap:
+            name: {{ $full }}-mosquitto-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $full }}-face-sub
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount.faceSub }}
+  selector:
+    matchLabels:
+      app: face-sub
+  template:
+    metadata:
+      labels:
+        app: face-sub
+    spec:
+      containers:
+        - name: face-sub
+          image: "{{ .Values.images.faceMd.repository }}:{{ .Values.images.faceMd.tag }}"
+          imagePullPolicy: {{ .Values.images.faceMd.pullPolicy }}
+          command: ["python", "face-data-sub.py"]
+          envFrom:
+            - configMapRef:
+                name: {{ $configName }}
+          volumeMounts:
+            - name: face-sub-data
+              mountPath: /app/data
+            - name: face-sub-logs
+              mountPath: /app/logs
+      volumes:
+        - name: face-sub-data
+          {{- if .Values.persistence.faceSubData.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ $full }}-face-sub-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: face-sub-logs
+          {{- if .Values.persistence.faceSubLogs.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ $full }}-face-sub-logs
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $full }}-face-pub
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount.facePub }}
+  selector:
+    matchLabels:
+      app: face-pub
+  template:
+    metadata:
+      labels:
+        app: face-pub
+    spec:
+      containers:
+        - name: face-pub
+          image: "{{ .Values.images.faceMd.repository }}:{{ .Values.images.faceMd.tag }}"
+          imagePullPolicy: {{ .Values.images.faceMd.pullPolicy }}
+          command: ["python", "face-data-pub.py"]
+          envFrom:
+            - configMapRef:
+                name: {{ $configName }}
+          volumeMounts:
+            - name: face-pub-counters
+              mountPath: /app/counters
+            - name: face-pub-logs
+              mountPath: /app/logs
+      volumes:
+        - name: face-pub-counters
+          {{- if .Values.persistence.facePubCounters.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ $full }}-face-pub-counters
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: face-pub-logs
+          {{- if .Values.persistence.facePubLogs.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ $full }}-face-pub-logs
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $full }}-live-match-engine
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount.liveMatchEngine }}
+  selector:
+    matchLabels:
+      app: live-match-engine
+  template:
+    metadata:
+      labels:
+        app: live-match-engine
+    spec:
+      containers:
+        - name: live-match-engine
+          image: "{{ .Values.images.facePp.repository }}:{{ .Values.images.facePp.tag }}"
+          imagePullPolicy: {{ .Values.images.facePp.pullPolicy }}
+          command: ["python", "live_match_engine.py"]
+          envFrom:
+            - configMapRef:
+                name: {{ $configName }}
+            - secretRef:
+                name: {{ $secretName }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $full }}-face-recognition-engine
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount.faceRecognitionEngine }}
+  selector:
+    matchLabels:
+      app: face-recognition-engine
+  template:
+    metadata:
+      labels:
+        app: face-recognition-engine
+    spec:
+      containers:
+        - name: face-recognition-engine
+          image: "{{ .Values.images.facePp.repository }}:{{ .Values.images.facePp.tag }}"
+          imagePullPolicy: {{ .Values.images.facePp.pullPolicy }}
+          command: ["python", "face_recognition_engine.py"]
+          envFrom:
+            - configMapRef:
+                name: {{ $configName }}
+            - secretRef:
+                name: {{ $secretName }}

@@ -3,7 +3,7 @@ from datetime import datetime
 from loguru import logger
 
 def process_face_metadata(payload):
-    data = payload.dict()
+    data = payload.model_dump() if hasattr(payload, "model_dump") else payload.dict()
     data["server_received_time"] = datetime.utcnow().isoformat()
     face_collection = get_face_collection()
 

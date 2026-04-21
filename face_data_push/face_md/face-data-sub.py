@@ -8,10 +8,11 @@ import requests # For cloud api
 import logging
 from logging.handlers import RotatingFileHandler
 
-# Broker
-broker = "mqtt" # For testing use this public broker
-port = 1883 # If want tls, use 8883 and need configuration
-topic = "face/data/raw"
+# Broker / API settings
+broker = os.getenv("MQTT_HOST", "mqtt")
+port = int(os.getenv("MQTT_PORT", "1883"))
+topic = os.getenv("FACE_DATA_TOPIC", "face/data/raw")
+api_base_url = os.getenv("FACE_API_BASE_URL", "http://api:5000").rstrip("/")
 
 # Set up logging
 os.makedirs("logs", exist_ok=True)
@@ -109,9 +110,7 @@ def save_received_data(data, folder="data"):
 # Function for forwarding face data to cloud API
 def forward_to_api(data):
     try:
-        #url = "http://localhost:5000/api/v1/faces-mongo" # Replace with real cloud API endpoint
-        url = "http://host.docker.internal:5000/api/v1/faces-mongo" # Replace with real cloud API endpoint
-        #url = "http://10.0.1.140:5000/api/v1/faces-mongo" # Real cloud API endpoint
+        url = f"{api_base_url}/api/v1/faces-mongo/"
         headers = {"Content-Type": "application/json"} # Specify that we're sending JSON
         response = requests.post(url, json=data)
         #headers = {"Authorization": f"Bearer {your_jwt_token}"} # Replace with real JWT credentials

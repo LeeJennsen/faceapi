@@ -1,43 +1,52 @@
+import base64
+import json
 import os
 import time
-import base64
-import paho.mqtt.client as mqtt
 from datetime import datetime
-import json
 
-MQTT_BROKER = '10.0.1.140'
-MQTT_PORT = 1883
-TOPIC = 'face/images/incoming'
+import paho.mqtt.client as mqtt
+
+from runtime import connect_mqtt, get_logger
+
+MQTT_BROKER = os.getenv("MQTT_HOST", "mqtt")
+MQTT_PORT = int(os.getenv("MQTT_PORT", "1883"))
+TOPIC = os.getenv("FACE_IMAGE_TOPIC", "face/images/incoming")
+
+LOGGER = get_logger(__name__, "logs/image-pusher.log")
+
 
 def encode_image_to_base64(filepath):
-    with open(filepath, 'rb') as f:
-        return base64.b64encode(f.read()).decode('utf-8')
+    with open(filepath, "rb") as file_handle:
+        return base64.b64encode(file_handle.read()).decode("utf-8")
+
 
 def push_images():
-    client = mqtt.Client()
-    client.connect(MQTT_BROKER, MQTT_PORT, 60)
-    image_dir = './images'
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    if not connect_mqtt(client, MQTT_BROKER, MQTT_PORT, LOGGER):
+        raise SystemExit(1)
 
-    for filename in os.listdir(image_dir):
-        if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+    image_dir = "./images"
+    client.loop_start()
+    try:
+        for filename in sorted(os.listdir(image_dir)):
+            if not filename.lower().endswith((".png", ".jpg", ".jpeg")):
+                continue
+
             path = os.path.join(image_dir, filename)
-            encoded = encode_image_to_base64(path)
-
-            camera_id = filename  # Use filename as camera_id
-
             message = {
-                'image': encoded,
-                'timestamp': datetime.utcnow().isoformat(),
-                'camera_id': camera_id,
-                'filename': filename
+                "image": encode_image_to_base64(path),
+                "timestamp": datetime.utcnow().isoformat(),
+                "camera_id": filename,
+                "filename": filename,
             }
 
             client.publish(TOPIC, json.dumps(message))
-            print(f"[+] Pushed {filename} from {camera_id}")
+            LOGGER.info("Published image %s", filename)
             time.sleep(1)
+    finally:
+        client.loop_stop()
+        client.disconnect()
 
-    client.disconnect()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     push_images()
-

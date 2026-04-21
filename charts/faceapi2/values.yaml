@@ -1,0 +1,145 @@
+nameOverride: ""
+fullnameOverride: ""
+
+images:
+  api:
+    repository: faceapi2/flask-face-api
+    tag: latest
+    pullPolicy: IfNotPresent
+  faceMd:
+    repository: faceapi2/face-md
+    tag: latest
+    pullPolicy: IfNotPresent
+  facePp:
+    repository: faceapi2/face-pp
+    tag: latest
+    pullPolicy: IfNotPresent
+  mysql:
+    repository: mysql
+    tag: "8"
+    pullPolicy: IfNotPresent
+  mongo:
+    repository: mongo
+    tag: "6"
+    pullPolicy: IfNotPresent
+  mqtt:
+    repository: eclipse-mosquitto
+    tag: "2.0"
+    pullPolicy: IfNotPresent
+  busybox:
+    repository: busybox
+    tag: "1.36"
+    pullPolicy: IfNotPresent
+
+config:
+  FLASK_ENV: production
+  MYSQL_HOST: mysql
+  MYSQL_PORT: "3306"
+  MYSQL_DATABASE: face_auth
+  MONGO_URI: mongodb://mongo:27017/face_metadata
+  JWT_EXPIRY_SECONDS: "3600"
+  JWT_REFRESH_EXPIRY_SECONDS: "604800"
+  SMTP_SERVER: smtpdm-ap-southeast-1.aliyun.com
+  SMTP_PORT: "465"
+  FROM_EMAIL: no-reply@servicemail.gluecktech.com
+  FROM_NAME: Glueck Tech Team
+  MQTT_HOST: mqtt
+  MQTT_PORT: "1883"
+  FACE_DATA_TOPIC: face/data/raw
+  FACE_IMAGE_TOPIC: face/images/incoming
+  FACE_API_BASE_URL: http://api:5000
+
+secret:
+  create: true
+  existingSecret: ""
+  values:
+    MYSQL_ROOT_PASSWORD: change-me
+    MYSQL_USER: faceuser
+    MYSQL_PASSWORD: change-me
+    JWT_SECRET_KEY: change-me
+    SMTP_USERNAME: change-me@example.com
+    SMTP_PASSWORD: change-me
+    ADMIN_PROMOTION_CODE: change-me
+
+service:
+  api:
+    type: ClusterIP
+    port: 5000
+  mysql:
+    port: 3306
+  mongo:
+    port: 27017
+  mqtt:
+    port: 1883
+    websocketPort: 9001
+
+persistence:
+  mysql:
+    enabled: true
+    size: 10Gi
+  mongo:
+    enabled: true
+    size: 10Gi
+  mosquittoData:
+    enabled: true
+    size: 1Gi
+  mosquittoLogs:
+    enabled: true
+    size: 1Gi
+  faceSubData:
+    enabled: true
+    size: 2Gi
+  faceSubLogs:
+    enabled: true
+    size: 1Gi
+  facePubCounters:
+    enabled: true
+    size: 1Gi
+  facePubLogs:
+    enabled: true
+    size: 1Gi
+
+replicaCount:
+  api: 1
+  mysql: 1
+  mongo: 1
+  mqtt: 1
+  faceSub: 1
+  facePub: 1
+  liveMatchEngine: 1
+  faceRecognitionEngine: 1
+
+jobs:
+  registerFaces:
+    enabled: true
+    backoffLimit: 3
+    ttlSecondsAfterFinished: 86400
+  imagePusher:
+    enabled: true
+    backoffLimit: 3
+    ttlSecondsAfterFinished: 86400
+
+ingress:
+  enabled: false
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+  hosts:
+    - host: faceapi2.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+autoscaling:
+  api:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80
+
+resources: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

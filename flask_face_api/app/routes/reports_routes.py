@@ -1,10 +1,9 @@
 from flask import request, make_response
 from flask_restx import Namespace, Resource
-from app.db.mongo import db
+from app.auth import token_required
+from app.db.mongo import get_face_collection
 from fpdf import FPDF
 from datetime import datetime
-from app.services.jwt_service import verify_token
-from functools import wraps
 from loguru import logger
 import json
 from collections import Counter
@@ -27,7 +26,7 @@ api = Namespace('reports', description='Report generation operations')
 # --- Helper Functions (Data Processing) ---
 
 def get_all_detections(filters):
-    mongo_data = list(db.face_data.find({}))
+    mongo_data = list(get_face_collection().find({}))
     all_detections = []
     for doc in mongo_data:
         for det in doc.get("detections", []):
@@ -276,15 +275,6 @@ class PDF(FPDF):
             max_row_height = max(max_row_height, self.get_y() - y_before_image)
         self.set_y(row_y + max_row_height + 5)
 
-# --- Token Decorator & API Resource ---
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = request.headers.get('Authorization', ' ').split(' ')[-1]
-        if not verify_token(token): return {'message': 'Token is invalid or expired'}, 401
-        return f(*args, **kwargs)
-    return decorated
-
 @api.route('/download')
 class DownloadReport(Resource):
     @api.doc(description="Generate and download a PDF statistics report with charts.")
@@ -384,8 +374,6 @@ class DownloadReport(Resource):
             response.headers.set('Content-Type', 'application/pdf')
             return response
             
-        except Exception as e:
-            logger.error(f"Failed to generate PDF report: {e}", exc_info=True)
-            import traceback
-            traceback.print_exc()
+        except Exception:
+            logger.exception("Failed to generate PDF report.")
             return {"message": "Failed to generate report due to an internal server error."}, 500

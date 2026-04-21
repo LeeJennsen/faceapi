@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "faceapi2.fullname" . }}-config
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+data:
+  {{- range $key, $value := .Values.config }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "faceapi2.fullname" . }}-mysql-init
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+data:
+  init.sql: |
+{{ .Files.Get "files/init.sql" | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "faceapi2.fullname" . }}-mosquitto-config
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+data:
+  mosquitto.conf: |
+{{ .Files.Get "files/mosquitto.conf" | indent 4 }}

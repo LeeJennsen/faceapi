@@ -2063,11 +2063,11 @@
           fetchData("/api/v1/users/all")
         ]);
 
-        appState.facesMongo = mongoRes.data || [];
-        appState.allDetections = (mongoRes.data || []).flatMap(d => (d.detections || []).map(det => ({ ...det, timestamp: det.timestamp || d.start_timestamp, camera_id: d.camera_id, device_id: d.device_id }))).filter(d => d.timestamp);
-        appState.fullRecord = fullRes.data || [];
-        appState.persons = persRes.data || [];
-        appState.tracking = trackRes.data || [];
+        appState.facesMongo = Array.isArray(mongoRes?.data) ? mongoRes.data : (Array.isArray(mongoRes) ? mongoRes : []);
+        appState.allDetections = appState.facesMongo.flatMap(d => (d.detections || []).map(det => ({ ...det, timestamp: det.timestamp || d.start_timestamp, camera_id: d.camera_id, device_id: d.device_id }))).filter(d => d.timestamp);
+        appState.fullRecord = Array.isArray(fullRes?.data) ? fullRes.data : (Array.isArray(fullRes) ? fullRes : []);
+        appState.persons = Array.isArray(persRes?.data) ? persRes.data : (Array.isArray(persRes) ? persRes : []);
+        appState.tracking = Array.isArray(trackRes?.data) ? trackRes.data : (Array.isArray(trackRes) ? trackRes : []);
         appState.users = usersRes.users || [];
 
         const timestamps = appState.allDetections.map(d => d.timestamp).filter(Boolean);
@@ -2355,6 +2355,26 @@
       renderGalleries();
     }
 
+    function normalizeImageSrc(imageValue) {
+      if (!imageValue) return '';
+      if (typeof imageValue !== 'string') return '';
+      return imageValue.startsWith('data:image') ? imageValue : `data:image/jpeg;base64,${imageValue}`;
+    }
+
+    function getPersonGalleryImage(item) {
+      const images = item?.images_json;
+      if (Array.isArray(images) && images.length > 0) return normalizeImageSrc(images[0]);
+      if (typeof images === 'string') {
+        try {
+          const parsed = JSON.parse(images);
+          if (Array.isArray(parsed) && parsed.length > 0) return normalizeImageSrc(parsed[0]);
+        } catch (e) {
+          return normalizeImageSrc(images);
+        }
+      }
+      return '';
+    }
+
     function getSummaryStats(detections) {
       const stats = {
         'Total Visits': detections.length,
@@ -2400,12 +2420,13 @@
       };
       render('persons-gallery-container', appState.persons, (item, i) => {
         let imgSrc = 'https://via.placeholder.com/150?text=No+Image';
-        if (item.images_json) try { const imgs = JSON.parse(item.images_json); if (imgs.length > 0) imgSrc = `data:image/jpeg;base64,${imgs[0]}`; } catch (e) { }
+        const personImg = getPersonGalleryImage(item);
+        if (personImg) imgSrc = personImg;
         return `<div class="img-container" style="animation-delay: ${i * 70}ms"><img src="${imgSrc}" alt="${item.label || 'Unknown'}" onerror="this.src='https://via.placeholder.com/150?text=Error'"><div class="img-overlay"><p class="label">${item.label || 'Unknown'}</p><p>ID: ${item.unique_id || 'N/A'}</p></div></div>`;
       });
       render('tracking-gallery-container', appState.tracking, (item, i) => {
-        let imgSrc = `data:image/jpeg;base64,${item.image_base64 || ''}`;
-        if (!item.image_base64) imgSrc = 'https://via.placeholder.com/150?text=No+Image';
+        let imgSrc = normalizeImageSrc(item.image_base64);
+        if (!imgSrc) imgSrc = 'https://via.placeholder.com/150?text=No+Image';
         return `<div class="img-container" style="animation-delay: ${i * 70}ms"><img src="${imgSrc}" alt="Track ${item.track_id}" onerror="this.src='https://via.placeholder.com/150?text=Error'"><div class="img-overlay"><p class="label">Track ID: ${item.track_id}</p><p>Time: ${new Date(item.timestamp).toLocaleString()}</p></div></div>`;
       });
     }
