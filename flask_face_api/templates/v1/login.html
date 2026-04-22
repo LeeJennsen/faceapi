@@ -3,429 +3,143 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Login · Face API</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+  <title>Sign In | FaceAPI2</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    /* --- UNIFIED AUTH DESIGN SYSTEM --- */
-    :root {
-      --bg-color: #f4f7f9;
-      --text-color: #1a202c;
-      --text-muted: #718096;
-      --primary-color: #4f46e5;
-      --secondary-color: #7c3aed;
-      --card-bg: #ffffff;
-      --input-bg: #fdfdff;
-      --input-border: #e2e8f0;
-      --input-focus-border: var(--primary-color);
-      --gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      --shadow-color: rgba(79, 70, 229, 0.2);
-    }
-
-    body.dark {
-      --bg-color: #121212;
-      --text-color: #e5e7eb;
-      --text-muted: #9ca3af;
-      --primary-color: #6366f1;
-      --secondary-color: #a78bfa;
-      --card-bg: #1e1e1e;
-      --input-bg: #2a2a2a;
-      --input-border: #4b5563;
-      --input-focus-border: var(--primary-color);
-      --shadow-color: rgba(99, 102, 241, 0.3);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-    }
-
-    html {
-      font-size: 16px;
-    }
-
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-    }
-
-    .card {
-      background: var(--card-bg);
-      padding: 2.5rem;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-      border: 1px solid var(--input-border);
-      width: 100%;
-      max-width: 420px;
-      position: relative;
-      text-align: center;
-      animation: fadeIn 0.5s ease-out;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .toggle-theme {
-      position: absolute;
-      top: 1.5rem;
-      right: 1.5rem;
-      background: var(--input-bg);
-      border: 1px solid var(--input-border);
-      color: var(--text-muted);
-      font-size: 1rem;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .toggle-theme:hover {
-      color: var(--text-color);
-    }
-
-    .gradient-text {
-      background: var(--gradient);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 0.5rem;
-      font-weight: 700;
-    }
-
-    p {
-      color: var(--text-muted);
-      margin-bottom: 2rem;
-      font-size: 1rem;
-    }
-
-    .input-group {
-      position: relative;
-      margin-bottom: 1.5rem;
-      text-align: left;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px 15px 12px 45px;
-      border: 1px solid var(--input-border);
-      border-radius: 10px;
-      background: var(--input-bg);
-      color: var(--text-color);
-      font-size: 1rem;
-      font-family: 'Inter', sans-serif;
-    }
-
-    input:focus {
-      outline: none;
-      border-color: var(--input-focus-border);
-      box-shadow: 0 0 0 3px var(--shadow-color);
-    }
-
-    .input-group>i:first-child {
-      position: absolute;
-      left: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      pointer-events: none;
-    }
-
-    .input-group .password-toggle {
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      cursor: pointer;
-      pointer-events: all;
-    }
-
-    .input-group .password-toggle:hover {
-      color: var(--text-color);
-    }
-
-    .form-options {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: -1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .form-options a {
-      color: var(--primary-color);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 0.9rem;
-    }
-
-    .form-options a:hover {
-      text-decoration: underline;
-    }
-
-    .action-btn {
-      width: 100%;
-      padding: 14px;
-      margin-top: 1rem;
-      background: var(--gradient);
-      color: #fff;
-      border: none;
-      font-size: 1rem;
-      font-weight: 600;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .action-btn:disabled {
-      background: var(--text-muted);
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .action-btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 7px 20px var(--shadow-color);
-    }
-
-    .foot {
-      text-align: center;
-      margin-top: 2rem;
-    }
-
-    .foot a {
-      color: var(--primary-color);
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .foot a:hover {
-      text-decoration: underline;
-    }
-
-    .captcha-group {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 10px;
-      border: 1px solid var(--input-border);
-      border-radius: 10px;
-      margin-top: 1.5rem;
-      cursor: pointer;
-      background-color: var(--input-bg);
-    }
-
-    .captcha-group input {
-      width: 1rem;
-      height: 1rem;
-      margin-right: 10px;
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: var(--primary-color);
-      color: #fff;
-      padding: 1rem 1.5rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      z-index: 100;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeInToast 0.5s forwards, fadeOutToast 0.5s 3.5s forwards;
-    }
-
-    @keyframes fadeInToast {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes fadeOutToast {
-      from {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      to {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='v1/auth-shell.css') }}">
 </head>
 
-<body>
-  <div class="card">
-    <button class="toggle-theme"><i class="fas fa-moon"></i></button>
-    <h2 class="gradient-text">Welcome Back!</h2>
-    <p>Login to access your dashboard.</p>
-    <form id="loginForm">
-      <div class="input-group">
-        <i class="fas fa-envelope"></i>
-        <input type="email" id="email" placeholder="Email" required>
+<body class="theme-dark">
+  <main class="auth-page">
+    <div class="auth-toolbar">
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+        <i class="fas fa-sun"></i>
+      </button>
+    </div>
+
+    <section class="auth-card" aria-label="Sign in">
+      <div class="auth-brand">
+        <div class="brand-mark" aria-hidden="true">F2</div>
+        <div class="brand-copy">
+          <p class="brand-label">FaceAPI2</p>
+          <h1>Trusted access for the FaceAPI2 control center.</h1>
+          <p class="brand-description">Use a dedicated sign-in page to reach the dashboard without mixing registration or recovery into the same screen.</p>
+        </div>
       </div>
-      <div class="input-group">
-        <i class="fas fa-lock"></i>
-        <input type="password" id="password" placeholder="Password" required>
-        <span class="password-toggle"><i class="fas fa-eye"></i></span>
-      </div>
-      <div class="form-options">
-        <a href="/v1/forgot_password">Forgot Password?</a>
-      </div>
-      <div class="captcha-group">
-        <input type="checkbox" id="captcha" name="captcha" required>
-        <label for="captcha">I'm not a robot</label>
-      </div>
-      <button type="submit" class="action-btn" id="loginBtn">Login</button>
-    </form>
-    <div class="foot">Don't have an account? <a href="/v1/register">Register Now</a></div>
-  </div>
+
+      <section class="auth-panel" aria-labelledby="login-title">
+        <div class="panel-heading">
+          <h2 id="login-title">Welcome back</h2>
+          <p>Use your FaceAPI2 account to sign in and continue to the dashboard.</p>
+        </div>
+
+        <form id="loginForm" class="auth-form" novalidate>
+          <div class="field">
+            <label for="login-email">Email</label>
+            <div class="input-shell">
+              <i class="fas fa-envelope input-icon" aria-hidden="true"></i>
+              <input type="email" id="login-email" name="email" placeholder="name@company.com" autocomplete="email" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-header">
+              <label for="login-password">Password</label>
+              <a class="text-link inline-link" href="/v1/forgot_password">Forgot password?</a>
+            </div>
+            <div class="input-shell">
+              <i class="fas fa-lock input-icon" aria-hidden="true"></i>
+              <input type="password" id="login-password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+              <button type="button" class="password-toggle" data-password-toggle aria-label="Toggle password visibility">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <label class="check-row" for="login-captcha">
+            <input type="checkbox" id="login-captcha" name="captcha" required>
+            <span>Confirm this sign-in request is initiated by an authorized operator.</span>
+          </label>
+
+          <button type="submit" class="primary-btn" id="loginBtn">Sign In to Dashboard</button>
+        </form>
+
+        <div class="panel-links">
+          <span>Need access?</span>
+          <a class="text-link" href="/v1/register">Create account</a>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div id="auth-toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="{{ url_for('static', filename='v1/auth-shell.js') }}"></script>
   <script>
-    // --- THEME ---
-    const body = document.body;
-    const toggleBtn = document.querySelector('.toggle-theme');
-    const toggleIcon = toggleBtn.querySelector('i');
+    document.addEventListener("DOMContentLoaded", function () {
+      const authUi = window.FaceAPIAuth;
+      const loginForm = document.getElementById("loginForm");
+      const loginButton = document.getElementById("loginBtn");
 
-    const setTheme = (theme) => {
-      body.className = theme;
-      localStorage.setItem('theme', theme);
-      toggleIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-    };
+      loginForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
 
-    const initializeTheme = () => {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme) {
-        setTheme(savedTheme);
-      } else {
-        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        setTheme(prefersDark ? 'dark' : 'light');
-      }
-    };
+        const email = loginForm.email.value.trim().toLowerCase();
+        const password = loginForm.password.value;
 
-    toggleBtn.addEventListener('click', () => {
-      const currentTheme = body.classList.contains('dark') ? 'light' : 'dark';
-      setTheme(currentTheme);
-    });
-
-    initializeTheme();
-
-    // --- TOAST NOTIFICATIONS ---
-    function toast(msg, isError = false) {
-      const el = document.createElement('div');
-      el.className = 'toast';
-      el.innerText = msg;
-      if (isError) el.style.backgroundColor = '#ef4444';
-      document.body.append(el);
-      setTimeout(() => el.remove(), 4000);
-    }
-
-    // --- PASSWORD VISIBILITY TOGGLE ---
-    document.querySelectorAll('.password-toggle').forEach(toggle => {
-      toggle.addEventListener('click', () => {
-        // Use closest() to find the parent .input-group and then find the input inside it.
-        // This is more robust than relying on element order with previousElementSibling.
-        const inputGroup = toggle.closest('.input-group');
-        const passwordInput = inputGroup.querySelector('input');
-        const icon = toggle.querySelector('i');
-
-        if (passwordInput.type === 'password') {
-          passwordInput.type = 'text';
-          icon.classList.remove('fa-eye');
-          icon.classList.add('fa-eye-slash');
-        } else {
-          passwordInput.type = 'password';
-          icon.classList.remove('fa-eye-slash');
-          icon.classList.add('fa-eye');
-        }
-      });
-    });
-
-    function validateEmail(email) {
-      const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-      return re.test(String(email).toLowerCase());
-    }
-
-    // --- FORM SUBMISSION ---
-    const loginForm = document.getElementById('loginForm');
-    const loginBtn = document.getElementById('loginBtn');
-
-    loginForm.addEventListener('submit', async e => {
-      e.preventDefault();
-
-      const email = e.target.email.value;
-
-      if (!validateEmail(email)) {
-        return toast('Please enter a valid email address.', true);
-      }
-
-      if (!e.target.captcha.checked) {
-        return toast('Please confirm you are not a robot.', true);
-      }
-
-      loginBtn.disabled = true;
-      loginBtn.innerText = 'Logging in...';
-
-      try {
-        const res = await fetch('/api/v1/users/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: email,
-            password: e.target.password.value
-          })
-        });
-
-        if (res.status === 429) {
-          toast('Too many login attempts. Please try again in a few minutes.', true);
+        if (!authUi.validateEmail(email)) {
+          authUi.showToast("Enter a valid email address before signing in.", "error");
           return;
         }
 
-        const data = await res.json();
-
-        if (res.ok) {
-          if (data.access_token && data.user) {
-            localStorage.setItem('access_token', data.access_token);
-            localStorage.setItem('currentUser', JSON.stringify(data.user));
-
-            toast('Login successful 🎉');
-            setTimeout(() => window.location.href = '/v1/dashboard', 1000);
-          } else {
-            toast('Login failed: Invalid response from server.', true);
-          }
-        } else {
-          toast(data.message || 'Login failed: Invalid credentials.', true);
+        if (!password) {
+          authUi.showToast("Enter your password to continue.", "error");
+          return;
         }
-      } catch (error) {
-        toast('An network error occurred. Please try again.', true);
-      } finally {
-        loginBtn.disabled = false;
-        loginBtn.innerText = 'Login';
-      }
+
+        if (!loginForm.captcha.checked) {
+          authUi.showToast("Confirm the operator verification check before signing in.", "error");
+          return;
+        }
+
+        const resetButton = authUi.createButtonState(loginButton, "Signing in...");
+
+        try {
+          const response = await fetch("/api/v1/users/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+          });
+          const payload = await response.json();
+
+          if (response.ok && payload.access_token && payload.user) {
+            localStorage.setItem("access_token", payload.access_token);
+            if (payload.refresh_token) {
+              localStorage.setItem("refresh_token", payload.refresh_token);
+            }
+            localStorage.setItem("currentUser", JSON.stringify(payload.user));
+            authUi.showToast("Authentication successful. Loading the dashboard now.", "success");
+            window.setTimeout(function () {
+              window.location.href = "/v1/dashboard";
+            }, 600);
+            return;
+          }
+
+          if (response.status === 429) {
+            authUi.showToast("Too many login attempts. Please wait and try again shortly.", "error");
+            return;
+          }
+
+          authUi.showToast(payload.message || "Sign-in failed. Check your credentials and try again.", "error");
+        } catch (_error) {
+          authUi.showToast("The platform could not reach the login service. Please try again.", "error");
+        } finally {
+          resetButton();
+        }
+      });
     });
   </script>
 </body>

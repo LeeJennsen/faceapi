@@ -1,0 +1,70 @@
+{{- $full := include "faceapi2.fullname" . -}}
+{{- if .Values.persistence.redis.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $full }}-redis-data
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.persistence.redis.size }}
+{{- end }}
+{{- if .Values.persistence.prometheus.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $full }}-prometheus-data
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.persistence.prometheus.size }}
+{{- end }}
+{{- if .Values.persistence.grafana.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $full }}-grafana-data
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.persistence.grafana.size }}
+{{- end }}
+{{- if .Values.persistence.loki.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $full }}-loki-data
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.persistence.loki.size }}
+{{- end }}
+{{- if .Values.persistence.alertmanager.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $full }}-alertmanager-data
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.persistence.alertmanager.size }}
+{{- end }}

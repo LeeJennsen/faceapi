@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Operations Center | FaceAPI2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #eef2f6;
+      --panel: rgba(255, 255, 255, 0.82);
+      --panel-strong: #ffffff;
+      --line: rgba(15, 23, 42, 0.08);
+      --text: #122033;
+      --muted: #5b6b81;
+      --primary: #0f766e;
+      --primary-soft: rgba(15, 118, 110, 0.14);
+      --danger: #c2410c;
+      --danger-soft: rgba(194, 65, 12, 0.14);
+      --success: #15803d;
+      --success-soft: rgba(21, 128, 61, 0.14);
+      --shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+      --radius: 24px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Manrope', sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(15, 118, 110, 0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(29, 78, 216, 0.16), transparent 24%),
+        linear-gradient(180deg, #f7fafc 0%, #e9eef5 100%);
+    }
+
+    .shell {
+      width: min(1280px, calc(100% - 32px));
+      margin: 24px auto 40px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero,
+    .panel {
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 28px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.66);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .hero p {
+      max-width: 760px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.02rem;
+      line-height: 1.7;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .status-pill.degraded {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .hero-actions a {
+      text-decoration: none;
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: var(--panel-strong);
+      font-weight: 700;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07);
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .span-3 { grid-column: span 3; }
+    .span-4 { grid-column: span 4; }
+    .span-5 { grid-column: span 5; }
+    .span-6 { grid-column: span 6; }
+    .span-7 { grid-column: span 7; }
+    .span-8 { grid-column: span 8; }
+    .span-12 { grid-column: span 12; }
+
+    .panel {
+      padding: 22px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .panel h2,
+    .panel h3 {
+      margin: 0;
+      letter-spacing: -0.03em;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .panel-note {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .stat-value {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .stat-tray {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .tiny-code {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.84rem;
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+
+    .health-list,
+    .endpoint-list,
+    .service-list,
+    .explain-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .health-item,
+    .endpoint-item,
+    .service-item,
+    .explain-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.75);
+    }
+
+    .service-item {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .service-item a {
+      text-decoration: none;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .badge.down {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .badge.neutral {
+      background: rgba(71, 85, 105, 0.12);
+      color: #334155;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 280px !important;
+    }
+
+    .footer-note {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.7;
+    }
+
+    .chart-fallback {
+      display: grid;
+      place-items: center;
+      min-height: 280px;
+      padding: 18px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.52);
+    }
+
+    @media (max-width: 1080px) {
+      .span-3,
+      .span-4,
+      .span-5,
+      .span-6,
+      .span-7,
+      .span-8 {
+        grid-column: span 6;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .shell {
+        width: min(100% - 20px, 1280px);
+        margin: 14px auto 28px;
+      }
+
+      .hero,
+      .panel {
+        padding: 18px;
+        border-radius: 20px;
+      }
+
+      .span-3,
+      .span-4,
+      .span-5,
+      .span-6,
+      .span-7,
+      .span-8,
+      .span-12 {
+        grid-column: span 12;
+      }
+
+      canvas {
+        height: 240px !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <span class="eyebrow">FaceAPI2 Operations Center</span>
+          <h1>Professional runtime visibility for health, metrics, logs, and alerts.</h1>
+          <p>
+            The raw endpoints still exist for machines and integrations, but this page turns them into a human-friendly
+            operating console. Use Grafana for dashboards and logs, Prometheus for ad-hoc querying, and Alertmanager for
+            active alert routing.
+          </p>
+        </div>
+        <div id="overall-status" class="status-pill">Checking stack status...</div>
+      </div>
+      <div class="hero-actions" id="service-actions"></div>
+    </section>
+
+    <section class="grid">
+      <article class="panel span-3">
+        <div class="stat-label">Total Requests</div>
+        <div class="stat-tray">
+          <div class="stat-value" id="total-requests">-</div>
+          <div class="tiny-code" id="service-version">Version -</div>
+        </div>
+      </article>
+      <article class="panel span-3">
+        <div class="stat-label">Average Latency</div>
+        <div class="stat-value" id="avg-latency">-</div>
+      </article>
+      <article class="panel span-3">
+        <div class="stat-label">5xx Error Rate</div>
+        <div class="stat-value" id="error-rate">-</div>
+      </article>
+      <article class="panel span-3">
+        <div class="stat-label">Uptime</div>
+        <div class="stat-value" id="uptime">-</div>
+      </article>
+
+      <article class="panel span-4">
+        <div class="panel-header">
+          <div>
+            <h2>Dependency Health</h2>
+            <p class="panel-note">Live readiness of the application’s critical stores and services.</p>
+          </div>
+        </div>
+        <div class="health-list" id="dependency-health"></div>
+      </article>
+
+      <article class="panel span-8">
+        <div class="panel-header">
+          <div>
+            <h2>Traffic Snapshot</h2>
+            <p class="panel-note">A quick view of request distribution and endpoint usage from the in-process metrics registry.</p>
+          </div>
+        </div>
+        <canvas id="request-status-chart"></canvas>
+      </article>
+
+      <article class="panel span-7">
+        <div class="panel-header">
+          <div>
+            <h2>Most Active Endpoints</h2>
+            <p class="panel-note">Useful for spotting where traffic is concentrating right now.</p>
+          </div>
+        </div>
+        <canvas id="endpoint-chart"></canvas>
+      </article>
+
+      <article class="panel span-5">
+        <div class="panel-header">
+          <div>
+            <h2>Platform Tools</h2>
+            <p class="panel-note">Direct links to the services that power the stack.</p>
+          </div>
+        </div>
+        <div class="service-list" id="service-list"></div>
+      </article>
+
+      <article class="panel span-6">
+        <div class="panel-header">
+          <div>
+            <h2>Why Some Endpoints Look Raw</h2>
+            <p class="panel-note">Nothing is broken here. These tools simply serve different audiences.</p>
+          </div>
+        </div>
+        <div class="explain-list">
+          <div class="explain-item">
+            <div>
+              <strong>/health</strong>
+              <div class="footer-note">Machine-readable JSON for probes and automation. This page is the human-friendly view.</div>
+            </div>
+          </div>
+          <div class="explain-item">
+            <div>
+              <strong>/metrics</strong>
+              <div class="footer-note">Prometheus requires plain-text exposition format, so the raw endpoint stays text by design.</div>
+            </div>
+          </div>
+          <div class="explain-item">
+            <div>
+              <strong>Prometheus and Alertmanager</strong>
+              <div class="footer-note">Prometheus is a query console and Alertmanager only shows alerts when rules fire. The preloaded Grafana dashboard is the polished front-end.</div>
+            </div>
+          </div>
+          <div class="explain-item">
+            <div>
+              <strong>Loki on port 3100</strong>
+              <div class="footer-note">Loki is a logs API, not a standalone web app. Use Grafana Explore for the actual logs UI.</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel span-6">
+        <div class="panel-header">
+          <div>
+            <h2>Operator Notes</h2>
+            <p class="panel-note">Helpful defaults so the local stack behaves like a real environment without unnecessary friction.</p>
+          </div>
+        </div>
+        <div class="endpoint-list" id="operator-notes"></div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const serviceActions = document.getElementById('service-actions');
+    const serviceList = document.getElementById('service-list');
+    const operatorNotes = document.getElementById('operator-notes');
+    const dependencyHealth = document.getElementById('dependency-health');
+    const overallStatus = document.getElementById('overall-status');
+    let requestStatusChart;
+    let endpointChart;
+
+    async function fetchJsonWithTimeout(url, timeoutMs = 10000) {
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+
+      try {
+        const response = await fetch(url, { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+        return await response.json();
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
+    }
+
+    function formatDuration(seconds) {
+      const value = Number(seconds || 0);
+      const hours = Math.floor(value / 3600);
+      const minutes = Math.floor((value % 3600) / 60);
+      const secs = Math.floor(value % 60);
+      if (hours > 0) return `${hours}h ${minutes}m`;
+      if (minutes > 0) return `${minutes}m ${secs}s`;
+      return `${secs}s`;
+    }
+
+    function renderLinks(links) {
+      const prominent = [
+        { label: 'App Dashboard', href: '/v1/dashboard' },
+        { label: 'Grafana Dashboards', href: links.grafana },
+        { label: 'Grafana Explore', href: `${links.grafana.replace(/\/$/, '')}/explore` },
+        { label: 'Prometheus Console', href: links.prometheus_query },
+        { label: 'Alertmanager', href: links.alertmanager },
+        { label: 'Raw Health', href: '/health' },
+      ];
+
+      serviceActions.innerHTML = prominent.map((item) => `
+        <a href="${item.href}" target="_blank" rel="noreferrer">${item.label}</a>
+      `).join('');
+
+      const serviceCards = [
+        {
+          title: 'Grafana',
+          href: links.grafana,
+          note: 'Primary visual UI for dashboards and logs. Local access is configured for direct viewing without requiring sign-up.',
+        },
+        {
+          title: 'Prometheus',
+          href: links.prometheus_query,
+          note: 'Query console for metrics exploration. The dashboard panels are already prebuilt in Grafana.',
+        },
+        {
+          title: 'Alertmanager',
+          href: links.alertmanager,
+          note: 'Shows active alerts once rule conditions fire. A heartbeat alert is provisioned so the UI is not completely empty.',
+        },
+        {
+          title: 'Loki API',
+          href: links.loki,
+          note: 'Raw logs backend. Use Grafana Explore for a proper log browsing interface.',
+        },
+      ];
+
+      serviceList.innerHTML = serviceCards.map((item) => `
+        <div class="service-item">
+          <div><strong>${item.title}</strong></div>
+          <div class="footer-note">${item.note}</div>
+          <a href="${item.href}" target="_blank" rel="noreferrer">${item.href}</a>
+        </div>
+      `).join('');
+    }
+
+    function renderNotes(summary) {
+      operatorNotes.innerHTML = `
+        <div class="endpoint-item">
+          <div>
+            <strong>Grafana Access</strong>
+            <div class="footer-note">Anonymous local viewing is enabled so dashboards open directly. If you re-enable login later, admin credentials come from your Grafana env or cluster secret.</div>
+          </div>
+          <span class="badge neutral">Local Dev</span>
+        </div>
+        <div class="endpoint-item">
+          <div>
+            <strong>Requests In Progress</strong>
+            <div class="footer-note">Current in-flight request count: ${summary.requests_in_progress}</div>
+          </div>
+          <span class="badge ${summary.requests_in_progress > 0 ? '' : 'neutral'}">${summary.requests_in_progress}</span>
+        </div>
+        <div class="endpoint-item">
+          <div>
+            <strong>Total 5xx Responses</strong>
+            <div class="footer-note">The current registry has recorded ${summary.error_requests} server-side errors.</div>
+          </div>
+          <span class="badge ${summary.error_requests > 0 ? 'down' : ''}">${summary.error_requests}</span>
+        </div>
+        <div class="endpoint-item">
+          <div>
+            <strong>Traffic Warm-Up</strong>
+            <div class="footer-note">If the charts look sparse, open the dashboard, docs, or run the k6 smoke test once to generate baseline traffic.</div>
+          </div>
+          <span class="badge neutral">Tip</span>
+        </div>
+      `;
+    }
+
+    function renderDependencies(health, readiness) {
+      dependencyHealth.innerHTML = Object.entries(health).map(([name, info]) => {
+        const ready = info.status === 'up';
+        const detail = info.detail ? `<div class="footer-note">${info.detail}</div>` : '';
+        return `
+          <div class="health-item">
+            <div>
+              <strong>${name.toUpperCase()}</strong>
+              ${detail}
+            </div>
+            <span class="badge ${ready ? '' : 'down'}">${info.status}</span>
+          </div>
+        `;
+      }).join('');
+
+      overallStatus.textContent = readiness ? 'All core dependencies are healthy' : 'Some dependencies need attention';
+      overallStatus.className = `status-pill${readiness ? '' : ' degraded'}`;
+    }
+
+    function renderChartFallback(canvasId, message) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      canvas.style.display = 'none';
+
+      let fallback = canvas.parentElement.querySelector('.chart-fallback');
+      if (!fallback) {
+        fallback = document.createElement('div');
+        fallback.className = 'chart-fallback';
+        canvas.insertAdjacentElement('afterend', fallback);
+      }
+
+      fallback.textContent = message;
+    }
+
+    function buildCharts(payload) {
+      if (typeof window.Chart === 'undefined') {
+        renderChartFallback('request-status-chart', 'Chart.js did not load, so only the text summary is available right now.');
+        renderChartFallback('endpoint-chart', 'Endpoint charts are unavailable because the browser could not load the chart library.');
+        return;
+      }
+
+      const statusContext = document.getElementById('request-status-chart').getContext('2d');
+      const endpointContext = document.getElementById('endpoint-chart').getContext('2d');
+      const statusDataset = payload.requests_by_status.length
+        ? payload.requests_by_status
+        : [{ status: 'No traffic yet', requests: 1 }];
+      const endpointDataset = payload.top_endpoints.length
+        ? payload.top_endpoints
+        : [{ endpoint: 'Open /docs or /v1/dashboard to generate traffic', requests: 0 }];
+      const statusLabels = statusDataset.map(item => item.status);
+      const statusValues = statusDataset.map(item => item.requests);
+      const endpointLabels = endpointDataset.map(item => item.endpoint);
+      const endpointValues = endpointDataset.map(item => item.requests);
+
+      if (requestStatusChart) requestStatusChart.destroy();
+      if (endpointChart) endpointChart.destroy();
+
+      requestStatusChart = new Chart(statusContext, {
+        type: 'doughnut',
+        data: {
+          labels: statusLabels,
+          datasets: [{
+            data: statusValues,
+            backgroundColor: payload.requests_by_status.length
+              ? ['#0f766e', '#2563eb', '#d97706', '#c2410c', '#7c3aed']
+              : ['#94a3b8'],
+            borderWidth: 0,
+          }],
+        },
+        options: {
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                font: { family: 'Manrope' }
+              }
+            }
+          },
+          cutout: '68%',
+          maintainAspectRatio: false,
+        },
+      });
+
+      endpointChart = new Chart(endpointContext, {
+        type: 'bar',
+        data: {
+          labels: endpointLabels,
+          datasets: [{
+            label: 'Requests',
+            data: endpointValues,
+            backgroundColor: '#0f766e',
+            borderRadius: 12,
+          }],
+        },
+        options: {
+          indexAxis: 'y',
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+          },
+          scales: {
+            x: {
+              beginAtZero: true,
+              grid: { color: 'rgba(15, 23, 42, 0.08)' },
+            },
+            y: {
+              grid: { display: false },
+            },
+          },
+        },
+      });
+    }
+
+    async function loadOperationsCenter() {
+      const payload = await fetchJsonWithTimeout('/api/v1/ops/overview');
+      const { summary } = payload.metrics;
+
+      document.getElementById('total-requests').textContent = summary.total_requests.toLocaleString();
+      document.getElementById('avg-latency').textContent = `${summary.average_latency_ms} ms`;
+      document.getElementById('error-rate').textContent = `${summary.error_rate_percent}%`;
+      document.getElementById('uptime').textContent = formatDuration(summary.uptime_seconds);
+      document.getElementById('service-version').textContent = `${payload.metrics.service} v${payload.metrics.version}`;
+
+      renderLinks(payload.links);
+      renderDependencies(payload.health.dependencies, payload.health.status === 'ok');
+      renderNotes(summary);
+      buildCharts(payload.metrics);
+    }
+
+    loadOperationsCenter().catch((error) => {
+      const timedOut = error?.name === 'AbortError';
+      overallStatus.textContent = timedOut
+        ? 'Operations data timed out'
+        : 'Unable to load operations data';
+      overallStatus.className = 'status-pill degraded';
+      serviceActions.innerHTML = `<a href="/health" target="_blank" rel="noreferrer">Open Raw Health</a>`;
+      operatorNotes.innerHTML = `
+        <div class="endpoint-item">
+          <div>
+            <strong>What to check next</strong>
+            <div class="footer-note">
+              Open <code>/health</code> or <code>/api/v1/ops/overview</code> directly. If they hang, one of the backing services is slow or unavailable.
+            </div>
+          </div>
+          <span class="badge down">${timedOut ? 'Timeout' : 'Error'}</span>
+        </div>
+      `;
+      console.error(error);
+    });
+  </script>
+</body>
+
+</html>

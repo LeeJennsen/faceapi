@@ -1,0 +1,13 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: register-faces
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: wait-for-mysql
+          command:
+            - sh
+            - -c
+            - until nc -z host.docker.internal 3307; do echo waiting for shared docker mysql; sleep 3; done

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ page_title | default("Access") }} | FaceAPI2{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='v1/auth-shell.css') }}">
+  {% block head_extra %}{% endblock %}
+</head>
+
+<body class="theme-dark">
+  <div class="auth-aurora auth-aurora-left"></div>
+  <div class="auth-aurora auth-aurora-right"></div>
+
+  <main class="auth-layout">
+    <header class="auth-topbar">
+      <a class="brand-badge" href="/v1/login" aria-label="Go to FaceAPI2 login">
+        <span class="brand-mark">F2</span>
+        <span class="brand-copy">
+          <strong>FaceAPI2</strong>
+          <small>Identity Workspace</small>
+        </span>
+      </a>
+
+      <div class="topbar-actions">
+        <a class="surface-link" href="/v1/dashboard/operations">Operations</a>
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+          <i class="fas fa-sun"></i>
+        </button>
+      </div>
+    </header>
+
+    <section class="auth-brief">
+      <div class="brief-topline">
+        <span class="brief-kicker">{{ auth_kicker | default("FaceAPI2 Control Suite") }}</span>
+        <span class="brief-chip"><i class="fas fa-sparkles"></i> Product-Style Access</span>
+      </div>
+
+      <div class="brief-copy">
+        <h1>{{ auth_heading | default("Professional biometric access workflows built for operators, auditors, and analysts.") }}</h1>
+        <p>{{ auth_description | default("FaceAPI2 brings authentication, monitoring, reporting, and audit-ready controls into one secure operational surface.") }}</p>
+      </div>
+
+      <div class="brief-showcase" aria-hidden="true">
+        <div class="showcase-float float-a">
+          <span class="float-label">Live feel</span>
+          <strong>Fast sign-in</strong>
+          <p>Product-style access flow with cleaner motion, lighter copy, and focused actions.</p>
+        </div>
+        <div class="showcase-float float-b">
+          <span class="float-label">Security</span>
+          <strong>OTP ready</strong>
+          <p>Verification and recovery stay close to the action without cluttering the page.</p>
+        </div>
+        <div class="showcase-phone">
+          <div class="showcase-phone-top">
+            <span class="showcase-tag">FaceAPI2 Feed</span>
+            <span class="showcase-pill"><i class="fas fa-circle"></i> Secure</span>
+          </div>
+          <div class="showcase-stack">
+            <article class="showcase-card highlight">
+              <strong>Visitor intelligence, styled like a modern product.</strong>
+              <p>Access flows feel lighter, clearer, and easier to trust on first use.</p>
+            </article>
+            <div class="showcase-row">
+              <article class="showcase-mini">
+                <span>Realtime</span>
+                <strong>Live detections</strong>
+              </article>
+              <article class="showcase-mini">
+                <span>Reports</span>
+                <strong>PDF exports</strong>
+              </article>
+            </div>
+            <article class="showcase-card">
+              <ul class="showcase-list">
+                <li><i class="fas fa-check"></i> Faster first-run comprehension</li>
+                <li><i class="fas fa-check"></i> Cleaner access and recovery states</li>
+                <li><i class="fas fa-check"></i> Direct path into dashboard and ops</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <div class="brief-stats">
+        <article class="stat-tile">
+          <span class="stat-label">Coverage</span>
+          <strong>Auth, Reports, Ops</strong>
+          <p>One access layer for the dashboard, reporting surfaces, and runtime tools.</p>
+        </article>
+        <article class="stat-tile">
+          <span class="stat-label">Security</span>
+          <strong>OTP + Role Aware</strong>
+          <p>Provisioning and recovery flows remain protected while staying easy to follow.</p>
+        </article>
+        <article class="stat-tile">
+          <span class="stat-label">Experience</span>
+          <strong>Polished and Familiar</strong>
+          <p>Closer to modern product onboarding than a traditional split enterprise login.</p>
+        </article>
+      </div>
+
+      <div class="brief-list">
+        <div class="brief-list-item">
+          <i class="fas fa-user-lock"></i>
+          <div>
+            <strong>Access governance</strong>
+            <span>Consistent authentication, password handling, and secure recovery across the platform.</span>
+          </div>
+        </div>
+        <div class="brief-list-item">
+          <i class="fas fa-chart-line"></i>
+          <div>
+            <strong>Operator-ready UX</strong>
+            <span>Clear states, strong validation, and responsive layouts for day-to-day enterprise use.</span>
+          </div>
+        </div>
+        <div class="brief-list-item">
+          <i class="fas fa-wave-square"></i>
+          <div>
+            <strong>Production mindset</strong>
+            <span>Designed to feel at home beside Grafana, Prometheus, Alertmanager, and audit logging.</span>
+          </div>
+        </div>
+      </div>
+
+      {% block brief_extra %}{% endblock %}
+    </section>
+
+    <section class="auth-panel-shell">
+      <div class="panel-topbar">
+        <span class="panel-breadcrumb">{{ page_label | default("Secure Access") }}</span>
+        <span class="panel-note">Friendly, focused, and role-aware</span>
+      </div>
+
+      <div class="auth-panel">
+        {% block form_panel %}{% endblock %}
+      </div>
+    </section>
+
+    <footer class="auth-shell-footer">
+      <span>FaceAPI2 workspace access</span>
+      <a class="text-link" href="/v1/dashboard/operations">Operations Center</a>
+    </footer>
+  </main>
+
+  <div id="auth-toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="{{ url_for('static', filename='v1/auth-shell.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+
+</html>

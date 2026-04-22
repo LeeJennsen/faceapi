@@ -356,27 +356,34 @@
 
     .page-content {
       display: none;
+      width: 100%;
+      min-width: 0;
     }
 
     .page-content.active {
-      display: block;
+      display: grid;
+      gap: 20px;
       animation: fadeIn 0.6s ease-out;
     }
 
     .page-header {
-      margin-bottom: 25px;
+      margin-bottom: 0;
       animation: fadeUp 0.5s ease-out;
+      min-width: 0;
     }
 
     .page-header h1 {
-      font-size: 2rem;
+      font-size: clamp(1.8rem, 3vw, 2.35rem);
       font-weight: 600;
       color: var(--text-color);
+      line-height: 1.15;
+      overflow-wrap: anywhere;
     }
 
     .page-header p {
       font-size: 1rem;
       color: var(--text-muted);
+      overflow-wrap: anywhere;
     }
 
     /* --- Cards --- */
@@ -385,12 +392,14 @@
       backdrop-filter: blur(var(--backdrop-blur));
       border: 1px solid var(--border-color);
       border-radius: 16px;
-      padding: 25px;
-      margin-bottom: 25px;
+      padding: 24px;
+      margin-bottom: 0;
       box-shadow: 0 8px 32px 0 var(--shadow-color);
       animation: fadeUp 0.5s ease-out forwards;
       opacity: 0;
       transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      overflow: hidden;
+      min-width: 0;
     }
 
     .card:hover {
@@ -402,7 +411,9 @@
     .card-header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 12px;
       margin-bottom: 20px;
       padding-bottom: 15px;
       border-bottom: 1px solid var(--border-color);
@@ -414,6 +425,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      overflow-wrap: anywhere;
     }
 
     .card-header h3 i {
@@ -522,13 +534,13 @@
 
     .chart-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
     }
 
     canvas {
       max-width: 100%;
-      height: 350px !important;
+      height: 320px !important;
     }
 
     /* --- Forms & Actions --- */
@@ -537,8 +549,9 @@
       justify-content: space-between;
       align-items: center;
       gap: 15px;
-      margin-bottom: 25px;
+      margin-bottom: 0;
       flex-wrap: wrap;
+      min-width: 0;
     }
 
     .filters {
@@ -546,6 +559,7 @@
       gap: 15px;
       flex-grow: 1;
       flex-wrap: wrap;
+      min-width: 0;
     }
 
     .filters select,
@@ -557,8 +571,9 @@
       color: var(--text-color);
       font-family: var(--font-family);
       font-size: 0.9rem;
-      flex-grow: 1;
-      min-width: 150px;
+      flex: 1 1 180px;
+      min-width: 0;
+      max-width: 100%;
       transition: all 0.3s ease;
     }
 
@@ -571,17 +586,21 @@
 
     .action-btn {
       padding: 10px 20px;
-      border-radius: 8px;
+      min-height: 44px;
+      border-radius: 10px;
       border: 1px solid var(--primary-color);
       background: var(--primary-color);
       color: #fff;
       cursor: pointer;
-      font-weight: 500;
+      font-weight: 600;
       font-family: var(--font-family);
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
+      text-align: center;
+      flex-wrap: wrap;
+      min-width: 0;
       transition: all 0.3s ease;
     }
 
@@ -614,7 +633,9 @@
 
     /* --- Tables & Galleries --- */
     .data-table-container {
-      overflow-x: auto;
+      overflow: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
     }
 
     .data-table {
@@ -628,7 +649,10 @@
       padding: 15px;
       text-align: left;
       border-bottom: 1px solid var(--border-color);
-      white-space: nowrap;
+      white-space: normal;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      vertical-align: top;
     }
 
     .data-table th {
@@ -921,10 +945,268 @@
       outline: none;
     }
 
+    .dashboard-hero {
+      background:
+        radial-gradient(circle at top left, rgba(88, 166, 255, 0.18), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(57, 197, 207, 0.14), transparent 28%),
+        linear-gradient(145deg, rgba(13, 17, 23, 0.96), rgba(22, 27, 34, 0.88));
+      border-color: rgba(88, 166, 255, 0.18);
+    }
+
+    body.light .dashboard-hero {
+      background:
+        radial-gradient(circle at top left, rgba(9, 105, 218, 0.12), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(15, 118, 110, 0.1), transparent 28%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(240, 244, 249, 0.92));
+      border-color: rgba(36, 41, 47, 0.08);
+    }
+
+    .dashboard-hero-shell,
+    .dashboard-section-grid,
+    .operations-grid,
+    .dashboard-kpi-grid,
+    .operations-link-grid,
+    .section-stack {
+      display: grid;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .dashboard-hero-shell {
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr);
+      align-items: start;
+    }
+
+    .dashboard-hero-copy,
+    .operations-hero-copy {
+      display: grid;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .dashboard-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(88, 166, 255, 0.12);
+      color: #8cc2ff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    body.light .dashboard-eyebrow {
+      color: var(--secondary-color);
+      background: rgba(9, 105, 218, 0.1);
+    }
+
+    .dashboard-hero-copy h1,
+    .operations-hero-copy h2 {
+      margin: 0;
+      line-height: 1.08;
+      letter-spacing: -0.04em;
+      overflow-wrap: anywhere;
+    }
+
+    .dashboard-hero-copy h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+    }
+
+    .operations-hero-copy h2 {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+    }
+
+    .dashboard-hero-copy p,
+    .operations-hero-copy p,
+    .dashboard-kpi-card p,
+    .dashboard-quick-card p,
+    .operations-item p,
+    .operations-link-tile span,
+    .status-chip small {
+      margin: 0;
+      color: var(--text-muted);
+      line-height: 1.65;
+      overflow-wrap: anywhere;
+    }
+
+    .dashboard-hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    .dashboard-kpi-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-content: start;
+    }
+
+    .dashboard-kpi-card,
+    .dashboard-quick-card,
+    .operations-item,
+    .operations-link-tile {
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 16px;
+      min-width: 0;
+    }
+
+    body.light .dashboard-kpi-card,
+    body.light .dashboard-quick-card,
+    body.light .operations-item,
+    body.light .operations-link-tile {
+      background: rgba(15, 23, 42, 0.02);
+    }
+
+    .dashboard-kpi-card span,
+    .operations-item span,
+    .operations-link-tile strong {
+      display: block;
+      overflow-wrap: anywhere;
+    }
+
+    .dashboard-kpi-card span {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .dashboard-kpi-card strong,
+    .dashboard-quick-card strong,
+    .operations-item strong {
+      display: block;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+      overflow-wrap: anywhere;
+    }
+
+    .dashboard-section-grid,
+    .operations-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .dashboard-span-4 {
+      grid-column: span 4;
+    }
+
+    .dashboard-span-5 {
+      grid-column: span 5;
+    }
+
+    .dashboard-span-6 {
+      grid-column: span 6;
+    }
+
+    .dashboard-span-7 {
+      grid-column: span 7;
+    }
+
+    .dashboard-span-8 {
+      grid-column: span 8;
+    }
+
+    .dashboard-span-12 {
+      grid-column: span 12;
+    }
+
+    .dashboard-quick-card {
+      display: grid;
+      gap: 12px;
+    }
+
+    .dashboard-quick-card .action-btn {
+      width: 100%;
+    }
+
+    .operations-hero-meta,
+    .operations-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      background: rgba(63, 185, 80, 0.14);
+      color: var(--accent-green);
+    }
+
+    .status-chip.down {
+      background: rgba(247, 120, 40, 0.14);
+      color: var(--accent-orange);
+    }
+
+    .status-chip.neutral {
+      background: rgba(139, 148, 158, 0.14);
+      color: var(--text-muted);
+    }
+
+    .operations-link-grid {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
+    .operations-link-tile {
+      text-decoration: none;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .operations-link-tile:hover {
+      transform: translateY(-2px);
+      border-color: var(--primary-color);
+    }
+
+    .operations-link-tile strong {
+      margin-bottom: 6px;
+      color: var(--text-color);
+    }
+
+    .operations-empty {
+      padding: 18px;
+      border: 1px dashed var(--border-color);
+      border-radius: 14px;
+      color: var(--text-muted);
+      line-height: 1.65;
+      overflow-wrap: anywhere;
+    }
+
 
     @keyframes spin {
       to {
         transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 1100px) {
+      .dashboard-hero-shell,
+      .dashboard-kpi-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .dashboard-span-4,
+      .dashboard-span-5,
+      .dashboard-span-6,
+      .dashboard-span-7,
+      .dashboard-span-8,
+      .dashboard-span-12 {
+        grid-column: span 12;
       }
     }
 
@@ -950,6 +1232,11 @@
         border-radius: 0;
         margin: 0 -15px 15px -15px;
         padding: 10px 15px;
+      }
+
+      .dashboard-hero-actions .action-btn,
+      .operations-hero-meta .status-chip {
+        width: 100%;
       }
     } /* data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN8AAAAcCAMAAADWW5oEAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAACfUExURf///5WVlQAAABQUFJ+fnyUlJTMzMygoKDQxL/Dw8Orq6vf39y87RDI0NS4+SzQwKzUtIzA4PipFWydKZTQvKODg4IqKikFBQSAgIDExMVJSUqurq7u7uysrK3Z2dtXV1UpKSmVlZQ9sqQdzuAlytStCViVPbw1urh1biSBWfYKCghkZGc/Pzx0dHWBgYMXFxbKyshhkmyBXgWlpaRdjlpBfzF8AAAABYktHRACIBR1IAAAAB3RJTUUH6QcSBwQs5lQcjAAAAAFvck5UAc+id5oAAAS3SURBVFjD7Zh5d6o8EIcRDEFcEAVJKilWqLVsot7v/9luAmRxoS739PS+572//lEYYsiTTGYmaNpPq6cb3yf9p+k0rQ/M7xP8abr/EZ9l8VGJC2prdT7wa7aT5+d8A9sePjfA4cWF7HJwP99IVTvK8URIHbwzdWfz2cTxVER3NHL5teih5fMXAUQAvyzVF4eQ9E5GYpqYI7xiEHEz4b0ClWbQXxEEyKqvGn1gvrVUxES+yuet44QrXnvNIrzHXGtHLo2zWSfM9rF1pdX5jONPfvsRx5bCl2aQQAAIQWau8BXglA9iIPhgFkkzRrV0BWVJuwMIQQKAMml+Qcqm7wwbO+2Mj4rBsZFPOV9zH3NiBjKhM1HbkjjZeNf5ktiRfCXCRZD2eyUg2KgkHzrjIxgKPlLI9cPmsqolHTTNMAoWy2phApwtLvgihDOO3fJZMyY6sPq/Jfj27424K1oTtsLb+Wx2+KCEn95NviPApJlL/wWamf8E3/nO62cYtBO1QKacs5ZvQFdcQPP9RwOGwwY2laGj5pueBpgxbbJ3PceyPOsXBeTgnXzUVYjNXxYYxurP+XzDNMTj1Mh0/rzlCwh4lXOh5Ac2eE/e1nzKPXPjbZyspy0T82m+MTv5AlyE4mWDKMr5YJ7nS6Hyy2Ee5XxjNnwlJC/KWj/EN6YbciTDpuu646/5/AIH2lU9zTfE2LieGGq+FOFA+cEtvqnqntacWcwrqvm8uq1jKXwhgukf8/k2k/BCA6+ud0n5jhXdm7Ziu8G3ns2ZOMU2jg9OF9921krhW7YB3C+Pjd4Wj/KZJiqo9Dbga7uCvHbxmQE2YaTdz9fmB0dsv3hjdfAlIlsml3yRXucwmrDKx/mKjErlO3byYXK2H27xNVL5utYvUST4KgTrBbNfU6YSk7fH/TPymfjDKMMvV/HYZi/fCCkf4NuzGOLyyss5fOWfB1qXTejfSPHPqDgZTA9CDvV8fAGm0cVHZ2+Mgeq+N+OLSsHiy1qxyMjTxJfWqOYHggtlP9DQx+8u+Ggm4SDHL/PDkaCqi6/U7AIXsqR5Ij9MRDR1aeF9Iz9ofaREux6QqemCjy4a32JjiXqFLzewqMS1pV7ovCZq8l9kmFn/ST7vQBfQ4fn9Qxam3fVZQGDZpqt+phQeF3yhcGU6DTKCXKnPjvTg0OaAHTKRSEBt/RJmZhbey3dWn5msZnFZovPG+3vqM80nhMA0jHbLF4QNWe3TzLgYsLwmcnVAyCq07fyVlse+ytfkP5nVhit6IFnktr+jTYHc37y+7lEXze/jW9fpbz4TPjmiZXXyazPfbOn5Id7crq81f1VgSFMYIBDJUo3ymYTlNUMslU9PAygzCkIyZX+x/NB8zJFFy/CYEVgYGaJNj8MLPlbDAP8uvovzkeXuxfnoY37P+UjTqlVRIFSQVC0sQj2rpUtXHKSAtUOlmqGNrJV6/tN2Zd0UlDvF6OtGu5glnQ/7Lr5Ge+V86833DDBZH8Zd59szPvrmXRVGp9to4HOpxryqdvZJO/9aOyo7r8L8tOkw4o3oVXRyfm8kM11D6wqpZms6nsze3alz1nZ80c3f9H3pId34vMT1n+W7U//4vl3f+33+N1IJ11Fa5rw/AAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDI1LTA3LTE4VDA3OjA0OjI2KzAwOjAwrPPaEAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyNS0wNy0xOFQwNzowNDoyNiswMDowMN2uYqwAAAAodEVYdGRhdGU6dGltZXN0YW1wADIwMjUtMDctMThUMDc6MDQ6NDQrMDA6MDDbS1vdAAAAAElFTkSuQmCC
   */
@@ -1016,6 +1303,8 @@
       <div class="sidebar-footer">
         <a class="sidebar-item" data-target="user-management-page"><i
             class="fas fa-users-cog"></i><span>Users</span></a>
+        <a class="sidebar-item" data-target="operations-page"><i
+            class="fas fa-satellite-dish"></i><span>Operations</span></a>
         <a class="sidebar-item" data-target="help-page"><i class="fas fa-question-circle"></i><span>Help</span></a>
       </div>
     </aside>
@@ -1031,32 +1320,73 @@
       </div>
 
       <div id="landing-page" class="page-content active">
-        <div class="page-header">
-          <h1>Welcome Back!</h1>
-          <p>Here's a summary of the activity across all your monitored locations.</p>
-        </div>
-        <div class="stats-grid">
-          <div class="stat-card" style="--i:1" onclick="showPage('realtime-stats-page')">
-            <i class="fas fa-clock" style="color:var(--accent-cyan)"></i>
-            <h4>Realtime View</h4>
-            <p>Last 60 Mins</p>
+        <section class="card dashboard-hero">
+          <div class="dashboard-hero-shell">
+            <div class="dashboard-hero-copy">
+              <span class="dashboard-eyebrow"><i class="fas fa-wave-square"></i> FaceAPI2 Workspace</span>
+              <h1>Monitor detections, reports, and runtime health from one clean dashboard.</h1>
+              <p>Everything stays inside the main dashboard layout so daily operations, analytics, and support workflows feel consistent and easy to scan.</p>
+              <div class="dashboard-hero-actions">
+                <button class="action-btn" type="button" onclick="showPage('realtime-stats-page')"><i class="fas fa-clock"></i> Open Realtime</button>
+                <button class="action-btn secondary" type="button" onclick="showPage('operations-page')"><i class="fas fa-satellite-dish"></i> Open Operations</button>
+              </div>
+            </div>
+            <div class="dashboard-kpi-grid">
+              <article class="dashboard-kpi-card">
+                <span>Realtime</span>
+                <strong>Last 60 Minutes</strong>
+                <p>Track live detections and quick trend changes without leaving the dashboard shell.</p>
+              </article>
+              <article class="dashboard-kpi-card">
+                <span>Reports</span>
+                <strong>Daily and Monthly</strong>
+                <p>Jump into filtered report views and export PDF summaries from the same workspace.</p>
+              </article>
+              <article class="dashboard-kpi-card">
+                <span>Operations</span>
+                <strong>Health and Metrics</strong>
+                <p>Runtime health, service links, and endpoint activity now live as a dashboard module.</p>
+              </article>
+              <article class="dashboard-kpi-card">
+                <span>Data</span>
+                <strong>Tables and Galleries</strong>
+                <p>Review raw records, person galleries, and tracking data with cleaner spacing and safer wrapping.</p>
+              </article>
+            </div>
           </div>
-          <div class="stat-card" style="--i:2" onclick="showPage('monthly-stats-page')">
-            <i class="fas fa-calendar-alt" style="color:var(--accent-purple)"></i>
-            <h4>Monthly Stats</h4>
-            <p>Historical Data</p>
-          </div>
-          <div class="stat-card" style="--i:3" onclick="showPage('persons-gallery-page')">
-            <i class="fas fa-images" style="color:var(--accent-pink)"></i>
-            <h4>Image Gallery</h4>
-            <p>Visual Records</p>
-          </div>
-          <div class="stat-card" style="--i:4" onclick="showPage('persons-page')">
-            <i class="fas fa-database" style="color:var(--accent-orange)"></i>
-            <h4>Raw Data</h4>
-            <p>Explore Tables</p>
-          </div>
-        </div>
+        </section>
+
+        <section class="dashboard-section-grid">
+          <article class="card dashboard-span-6 dashboard-quick-card">
+            <div class="card-header">
+              <h3><i class="fas fa-compass"></i> Quick Access</h3>
+            </div>
+            <button class="action-btn" type="button" onclick="showPage('realtime-stats-page')">Realtime Statistics</button>
+            <button class="action-btn secondary" type="button" onclick="showPage('monthly-stats-page')">Monthly Statistics</button>
+            <button class="action-btn secondary" type="button" onclick="showPage('persons-gallery-page')">Person Gallery</button>
+            <button class="action-btn secondary" type="button" onclick="showPage('operations-page')">Operations Module</button>
+          </article>
+
+          <article class="card dashboard-span-6">
+            <div class="card-header">
+              <h3><i class="fas fa-layer-group"></i> Workspace Overview</h3>
+            </div>
+            <div class="section-stack">
+              <div class="operations-item">
+                <strong>Dashboard-first layout</strong>
+                <p>Analytics, user management, and operations are all rendered inside the main content area with the same spacing rules.</p>
+              </div>
+              <div class="operations-item">
+                <strong>Safer content wrapping</strong>
+                <p>Cards, tables, and headings now wrap inside their containers instead of overflowing or colliding with nearby elements.</p>
+              </div>
+              <div class="operations-item">
+                <strong>Consistent navigation</strong>
+                <p>Use the sidebar for modules and the topbar for account actions while the page content swaps in place.</p>
+              </div>
+            </div>
+          </article>
+        </section>
       </div>
 
       <div id="realtime-stats-page" class="page-content">
@@ -1314,11 +1644,99 @@
           <div id="tracking-table-container" class="data-table-container"></div>
         </div>
       </div>
+      <div id="operations-page" class="page-content">
+        <div class="page-header">
+          <h1>Operations</h1>
+          <p>Runtime health, metrics, and platform tooling rendered inside the dashboard content area.</p>
+        </div>
+        <div class="card">
+          <div class="operations-hero-meta">
+            <div class="operations-hero-copy">
+              <span class="dashboard-eyebrow"><i class="fas fa-satellite-dish"></i> Operations Module</span>
+              <h2>Health, links, and traffic visibility without leaving the dashboard.</h2>
+              <p>Use this module for service checks, monitoring links, and request trends while keeping the standard sidebar, topbar, and card layout intact.</p>
+            </div>
+            <div id="operations-overall-status" class="status-chip neutral">Loading operations data...</div>
+          </div>
+          <div id="operations-service-actions" class="operations-link-grid"></div>
+        </div>
+        <div class="stats-grid operations-summary-grid">
+          <div class="stat-card">
+            <h4>Total Requests</h4>
+            <p id="operations-total-requests">-</p>
+          </div>
+          <div class="stat-card">
+            <h4>Average Latency</h4>
+            <p id="operations-avg-latency">-</p>
+          </div>
+          <div class="stat-card">
+            <h4>5xx Error Rate</h4>
+            <p id="operations-error-rate">-</p>
+          </div>
+          <div class="stat-card">
+            <h4>Uptime</h4>
+            <p id="operations-uptime">-</p>
+          </div>
+        </div>
+        <div class="operations-grid">
+          <div class="card dashboard-span-4">
+            <div class="card-header">
+              <h3><i class="fas fa-heart-pulse"></i> Dependency Health</h3>
+            </div>
+            <div id="operations-dependency-health" class="section-stack"></div>
+          </div>
+          <div class="card dashboard-span-8">
+            <div class="card-header">
+              <h3><i class="fas fa-chart-pie"></i> Request Status Mix</h3>
+              <span id="operations-service-version" class="status-chip neutral">Version -</span>
+            </div>
+            <canvas id="operations-request-status-chart"></canvas>
+          </div>
+          <div class="card dashboard-span-7">
+            <div class="card-header">
+              <h3><i class="fas fa-chart-bar"></i> Most Active Endpoints</h3>
+            </div>
+            <canvas id="operations-endpoint-chart"></canvas>
+          </div>
+          <div class="card dashboard-span-5">
+            <div class="card-header">
+              <h3><i class="fas fa-link"></i> Platform Tools</h3>
+            </div>
+            <div id="operations-service-list" class="section-stack"></div>
+          </div>
+          <div class="card dashboard-span-6">
+            <div class="card-header">
+              <h3><i class="fas fa-clipboard-list"></i> Operator Notes</h3>
+            </div>
+            <div id="operations-operator-notes" class="section-stack"></div>
+          </div>
+          <div class="card dashboard-span-6">
+            <div class="card-header">
+              <h3><i class="fas fa-circle-info"></i> Endpoint Context</h3>
+            </div>
+            <div class="section-stack">
+              <div class="operations-item">
+                <strong>/health</strong>
+                <p>Machine-readable health data still powers probes and automation. This module turns that same signal into a readable operator view.</p>
+              </div>
+              <div class="operations-item">
+                <strong>/metrics</strong>
+                <p>Prometheus keeps the raw text endpoint. Use the linked tools here when you need a friendlier monitoring surface.</p>
+              </div>
+              <div class="operations-item">
+                <strong>Grafana, Prometheus, and Alertmanager</strong>
+                <p>Dashboards, ad-hoc queries, and alerts all stay one click away without breaking the dashboard layout.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div id="user-management-page" class="page-content">
         <div class="page-header">
           <h1>User Management</h1>
           <p>Administer user accounts, roles, and permissions.</p>
         </div>
+        <div id="user-table-meta" class="table-meta"></div>
         <div id="user-management-container">
         </div>
       </div>
@@ -1374,6 +1792,13 @@
           <option value="landing-page">Dashboard</option>
           <option value="realtime-stats-page">Realtime Statistics</option>
           <option value="monthly-stats-page">Monthly Statistics</option>
+          <option value="operations-page">Operations</option>
+        </select>
+        <label for="refresh-interval-select" style="margin-top:15px;">Realtime refresh interval:</label>
+        <select id="refresh-interval-select">
+          <option value="30">Every 30 seconds</option>
+          <option value="60">Every 60 seconds</option>
+          <option value="120">Every 2 minutes</option>
         </select>
         <button id="save-preferences-btn" class="action-btn" style="margin-top:20px;">Save Preferences</button>
       </div>
@@ -1554,14 +1979,131 @@
     const defaultSettings = {
       theme: 'dark',
       itemsPerPage: '50',
-      landingPage: 'landing-page'
+      landingPage: 'landing-page',
+      refreshInterval: '60'
     };
+    const requestedInitialTab = {{ initial_tab | default('landing') | tojson }};
+    const pageIdToTab = {
+      'landing-page': 'landing',
+      'realtime-stats-page': 'realtime',
+      'monthly-stats-page': 'monthly',
+      'daily-stats-page': 'daily',
+      'persons-gallery-page': 'persons-gallery',
+      'tracking-gallery-page': 'tracking-gallery',
+      'facesMongo-page': 'mongo-faces',
+      'fullRecord-page': 'full-record',
+      'persons-page': 'persons',
+      'tracking-page': 'tracking',
+      'operations-page': 'operations',
+      'user-management-page': 'users',
+      'help-page': 'help'
+    };
+    const tabToPageId = Object.fromEntries(Object.entries(pageIdToTab).map(([pageId, tab]) => [tab, pageId]));
     let currentUser;
 
+    function normalizePageId(value) {
+      const normalized = String(value || '').trim();
+      if (!normalized) return null;
+      if (pageIdToTab[normalized]) return normalized;
+      return tabToPageId[normalized] || null;
+    }
+
+    function syncDashboardUrl(pageId) {
+      const tab = pageIdToTab[pageId];
+      if (!tab) return;
+
+      const nextUrl = new URL(window.location.href);
+      if (tab === 'landing') {
+        nextUrl.searchParams.delete('tab');
+      } else {
+        nextUrl.searchParams.set('tab', tab);
+      }
+      window.history.replaceState({}, '', `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
+    }
+
     // --- UTILITY FUNCTIONS ---
+    let logoutInProgress = false;
+
+    function clearStoredAuth() {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('currentUser');
+    }
+
     function forceLogout() {
-      localStorage.clear();
-      window.location.href = 'login';
+      if (logoutInProgress) return;
+      logoutInProgress = true;
+      clearStoredAuth();
+      window.location.href = '/v1/login';
+    }
+
+    function storeSession(payload = {}) {
+      if (payload.access_token) {
+        localStorage.setItem('access_token', payload.access_token);
+      }
+      if (payload.refresh_token) {
+        localStorage.setItem('refresh_token', payload.refresh_token);
+      }
+      if (payload.user) {
+        localStorage.setItem('currentUser', JSON.stringify(payload.user));
+      }
+    }
+
+    async function refreshAccessToken() {
+      const refreshToken = localStorage.getItem('refresh_token');
+      if (!refreshToken) return null;
+
+      try {
+        const response = await fetch('/api/v1/users/refresh', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh_token: refreshToken })
+        });
+
+        if (!response.ok) {
+          return null;
+        }
+
+        const payload = await response.json();
+        if (!payload?.access_token) {
+          return null;
+        }
+
+        storeSession(payload);
+        return payload.access_token;
+      } catch (error) {
+        console.error('Session refresh failed:', error);
+        return null;
+      }
+    }
+
+    async function getValidAccessToken() {
+      const token = localStorage.getItem('access_token');
+      if (token) return token;
+      return refreshAccessToken();
+    }
+
+    async function authenticatedFetch(endpoint, options = {}) {
+      const requestWithToken = async (token) => {
+        const headers = new Headers(options.headers || {});
+        if (token) {
+          headers.set('Authorization', `Bearer ${token}`);
+        }
+        return fetch(endpoint, { ...options, headers });
+      };
+
+      let response = await requestWithToken(await getValidAccessToken());
+      if (response.status !== 401) {
+        return response;
+      }
+
+      const refreshedToken = await refreshAccessToken();
+      if (!refreshedToken) {
+        return response;
+      }
+
+      response = await requestWithToken(refreshedToken);
+      return response;
     }
 
     // --- CUSTOM DIALOGS ---
@@ -1659,6 +2201,7 @@
       document.getElementById('theme-select').value = appSettings.theme;
       document.getElementById('items-per-page-select').value = appSettings.itemsPerPage;
       document.getElementById('landing-page-select').value = appSettings.landingPage;
+      document.getElementById('refresh-interval-select').value = appSettings.refreshInterval;
 
       console.log('Applied settings:', appSettings);
       updateAllChartsTheme();
@@ -1675,6 +2218,7 @@
       appSettings.theme = document.getElementById('theme-select').value;
       appSettings.itemsPerPage = document.getElementById('items-per-page-select').value;
       appSettings.landingPage = document.getElementById('landing-page-select').value;
+      appSettings.refreshInterval = document.getElementById('refresh-interval-select').value;
       localStorage.setItem('appSettings', JSON.stringify(appSettings));
       showCustomAlert('Settings saved!');
       document.getElementById('settings-modal').classList.remove('active');
@@ -1698,12 +2242,12 @@
 
     async function fetchData(endpoint) {
       try {
-        const token = localStorage.getItem("access_token");
-        const response = await fetch(endpoint, { headers: { Authorization: `Bearer ${token}` } });
+        const response = await authenticatedFetch(endpoint);
         if (!response.ok) {
           if (response.status === 401) {
             showCustomAlert("Session expired. Please log in again.", "Authentication Error");
             forceLogout();
+            return { data: [], users: [] };
           }
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -1716,9 +2260,102 @@
       }
     }
 
-    function showPage(pageId) {
+    function buildMongoDetections(records = []) {
+      if (!Array.isArray(records)) return [];
+
+      return records.flatMap(record => {
+        const detections = Array.isArray(record?.detections) ? record.detections : [];
+        return detections.map(detection => ({
+          ...detection,
+          source: 'mongo',
+          record_id: record.face_unique_id || record.start_timestamp || detection.track_id,
+          timestamp: detection.timestamp || record.start_timestamp || record.server_received_time,
+          camera_id: detection.camera_id || record.camera_id,
+          device_id: detection.device_id || record.device_id
+        }));
+      }).filter(detection => detection.timestamp);
+    }
+
+    function buildTrackingDetections(records = []) {
+      if (!Array.isArray(records)) return [];
+
+      return records.map(record => ({
+        source: 'tracking',
+        record_id: record.id || record.track_id,
+        track_id: record.track_id,
+        unique_id: record.unique_id,
+        timestamp: record.timestamp,
+        camera_id: record.camera_id || 'Unknown',
+        device_id: record.device_id || record.camera_id || 'Unknown',
+        confidence: Number(record.confidence) || 0,
+        gender: record.gender || 'Unknown',
+        age: record.age || 'Unknown',
+        emotion: record.emotion || 'Unknown',
+        attention_time: Number(record.attention_time) || 0,
+        length_of_stay: Number(record.length_of_stay) || 0,
+        location: record.location || record.camera_id || 'Unknown',
+        face_quality_score: Number(record.face_quality_score) || 0
+      })).filter(detection => detection.timestamp);
+    }
+
+    function syncDetectionState(mongoRecords = [], trackingRecords = []) {
+      appState.facesMongo = Array.isArray(mongoRecords) ? mongoRecords : [];
+      appState.tracking = Array.isArray(trackingRecords) ? trackingRecords : [];
+
+      const detections = [...buildMongoDetections(appState.facesMongo), ...buildTrackingDetections(appState.tracking)];
+      const uniqueDetections = new Map();
+
+      detections.forEach((detection, index) => {
+        const key = [
+          detection.source || 'unknown',
+          detection.record_id || index,
+          detection.track_id || 'unknown',
+          detection.timestamp || 'unknown',
+          detection.camera_id || 'unknown'
+        ].join('|');
+
+        if (!uniqueDetections.has(key)) {
+          uniqueDetections.set(key, detection);
+        }
+      });
+
+      appState.allDetections = Array.from(uniqueDetections.values());
+    }
+
+    function refreshDetectionFilterOptions() {
+      const timestamps = appState.allDetections.map(d => d.timestamp).filter(Boolean);
+      const years = [...new Set(timestamps.map(t => new Date(t).getFullYear().toString()))];
+      const months = [...new Set(timestamps.map(t => t.slice(0, 7)))];
+      const devices = [...new Set(appState.allDetections.map(d => d.device_id).filter(Boolean))];
+      const cameras = [...new Set(appState.allDetections.map(d => d.camera_id).filter(Boolean))];
+      const locations = [...new Set(appState.allDetections.map(d => d.location).filter(Boolean).filter(location => location !== 'Unknown'))];
+
+      ['monthly-filter-year', 'monthly-filter-month', 'monthly-filter-device', 'monthly-filter-camera', 'daily-filter-device', 'daily-filter-camera', 'realtime-insights-filter-location', 'monthly-insights-filter-location', 'daily-insights-filter-location'].forEach(id => {
+        if (id.endsWith('year')) populateSelect(id, years, 'All Years');
+        else if (id.endsWith('month')) populateSelect(id, months, 'All Months');
+        else if (id.endsWith('device')) populateSelect(id, devices, 'All Devices');
+        else if (id.endsWith('camera')) populateSelect(id, cameras, 'All Cameras');
+        else if (id.endsWith('location')) populateSelect(id, locations, 'All Locations');
+      });
+
+      if (years.length > 0 && !document.getElementById('monthly-filter-year').value) {
+        document.getElementById('monthly-filter-year').value = years.sort().reverse()[0];
+      }
+      if (months.length > 0 && !document.getElementById('monthly-filter-month').value) {
+        document.getElementById('monthly-filter-month').value = months.sort().reverse()[0];
+      }
+
+      const dailyDateField = document.getElementById('daily-filter-date');
+      const allDates = [...new Set(timestamps.map(t => t.slice(0, 10)))].sort();
+      if (dailyDateField && allDates.length > 0 && !dailyDateField.value) {
+        dailyDateField.value = allDates[allDates.length - 1];
+      }
+    }
+
+    function showPage(pageId, options = {}) {
+      const normalizedPageId = normalizePageId(pageId) || 'landing-page';
       document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
-      const targetPage = document.getElementById(pageId);
+      const targetPage = document.getElementById(normalizedPageId);
       if (targetPage) {
         targetPage.classList.add('active');
         targetPage.querySelectorAll('.card, .stat-card, .img-container').forEach((el, i) => {
@@ -1727,15 +2364,20 @@
           requestAnimationFrame(() => { el.style.opacity = '1'; });
         });
       }
-      document.querySelectorAll('.sidebar-item').forEach(li => li.classList.toggle('active', li.dataset.target === pageId));
+      document.querySelectorAll('.sidebar-item').forEach(li => li.classList.toggle('active', li.dataset.target === normalizedPageId));
       document.getElementById('main').scrollTop = 0;
       if (window.innerWidth <= 768) sidebar.classList.add('hidden');
+      if (options.updateUrl !== false) syncDashboardUrl(normalizedPageId);
 
       const activePage = document.querySelector('.page-content.active')?.id;
       if (activePage === 'user-management-page') {
         fetchAndRenderUsers();
       }
-      else if (activePage === 'realtime-stats-page') updateRealtimeDashboard();
+      else if (activePage === 'operations-page') loadOperationsOverview();
+      else if (activePage === 'realtime-stats-page') {
+        updateRealtimeDashboard();
+        refreshRealtimeData();
+      }
       else if (activePage === 'daily-stats-page') updateDashboard('daily', getFilteredDetections('daily'));
       else if (activePage === 'monthly-stats-page') updateDashboard('monthly', getFilteredDetections('monthly'));
     }
@@ -1745,8 +2387,13 @@
       if (!select) return;
       const currentValue = select.value;
       select.innerHTML = `<option value="">${defaultOptionText}</option>`;
-      [...new Set(items)].sort().forEach(item => { if (item) select.add(new Option(item, item)); });
-      if (currentValue && items.includes(currentValue)) select.value = currentValue;
+      const uniqueItems = [...new Set(items)].filter(Boolean).sort();
+      uniqueItems.forEach(item => { select.add(new Option(item, item)); });
+      if (currentValue && uniqueItems.includes(currentValue)) {
+        select.value = currentValue;
+      } else if (selectId.endsWith('insights-filter-location') && !select.value && uniqueItems.length > 0) {
+        select.value = uniqueItems[0];
+      }
     }
 
     const countBy = (arr, property) => arr.reduce((acc, cur) => {
@@ -1824,6 +2471,210 @@
       if (activePageId === 'realtime-stats-page') updateRealtimeDashboard();
       else if (activePageId === 'daily-stats-page') updateDashboard('daily', getFilteredDetections('daily'));
       else if (activePageId === 'monthly-stats-page') updateDashboard('monthly', getFilteredDetections('monthly'));
+      else if (activePageId === 'operations-page') loadOperationsOverview();
+    }
+
+    function formatOperationsDuration(seconds) {
+      const totalSeconds = Number(seconds || 0);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const remainingSeconds = Math.floor(totalSeconds % 60);
+
+      if (hours > 0) return `${hours}h ${minutes}m`;
+      if (minutes > 0) return `${minutes}m ${remainingSeconds}s`;
+      return `${remainingSeconds}s`;
+    }
+
+    function renderOperationsLinks(links = {}) {
+      const serviceActions = document.getElementById('operations-service-actions');
+      const serviceList = document.getElementById('operations-service-list');
+      if (!serviceActions || !serviceList) return;
+
+      const actionItems = [
+        { label: 'Grafana', href: links.grafana },
+        { label: 'Prometheus', href: links.prometheus_query },
+        { label: 'Alertmanager', href: links.alertmanager },
+        { label: 'Raw Health', href: '/health' }
+      ].filter(item => item.href);
+
+      serviceActions.innerHTML = actionItems.map(item => `
+        <a class="operations-link-tile" href="${item.href}" target="_blank" rel="noreferrer">
+          <strong>${item.label}</strong>
+          <span>Open ${item.label.toLowerCase()} in a new tab.</span>
+        </a>
+      `).join('');
+
+      const serviceCards = [
+        {
+          title: 'Grafana Dashboards',
+          note: 'Primary visual UI for dashboards and logs.',
+          href: links.grafana
+        },
+        {
+          title: 'Prometheus Query',
+          note: 'Use the query console when you need raw metrics exploration.',
+          href: links.prometheus_query
+        },
+        {
+          title: 'Alertmanager',
+          note: 'Review alert routing and active alert state.',
+          href: links.alertmanager
+        },
+        {
+          title: 'Loki API',
+          note: 'Logs backend for Grafana Explore and integrations.',
+          href: links.loki
+        }
+      ].filter(item => item.href);
+
+      serviceList.innerHTML = serviceCards.map(item => `
+        <div class="operations-item">
+          <strong>${item.title}</strong>
+          <p>${item.note}</p>
+          <a class="text-link" href="${item.href}" target="_blank" rel="noreferrer">${item.href}</a>
+        </div>
+      `).join('');
+    }
+
+    function renderOperationsDependencies(dependencies = {}) {
+      const container = document.getElementById('operations-dependency-health');
+      if (!container) return;
+
+      const entries = Object.entries(dependencies);
+      if (!entries.length) {
+        container.innerHTML = '<div class="operations-empty">Dependency health is not available yet.</div>';
+        return;
+      }
+
+      container.innerHTML = entries.map(([name, info]) => `
+        <div class="operations-item">
+          <div class="operations-item-row">
+            <strong>${name.toUpperCase()}</strong>
+            <span class="status-chip ${info.status === 'down' ? 'down' : info.status === 'up' ? '' : 'neutral'}">${info.status}</span>
+          </div>
+          <p>${info.detail || 'Connection check completed without extra detail.'}</p>
+        </div>
+      `).join('');
+    }
+
+    function renderOperationsNotes(summary = {}) {
+      const container = document.getElementById('operations-operator-notes');
+      if (!container) return;
+
+      const noteItems = [
+        {
+          title: 'Requests in Progress',
+          detail: `Current in-flight requests: ${summary.requests_in_progress || 0}.`
+        },
+        {
+          title: 'Tracked 5xx Responses',
+          detail: `Server-side error count in the current metrics snapshot: ${summary.error_requests || 0}.`
+        },
+        {
+          title: 'Traffic Warm-Up',
+          detail: 'If charts look sparse, open dashboard modules or run the smoke test once to generate baseline traffic.'
+        }
+      ];
+
+      container.innerHTML = noteItems.map(item => `
+        <div class="operations-item">
+          <strong>${item.title}</strong>
+          <p>${item.detail}</p>
+        </div>
+      `).join('');
+    }
+
+    function renderOperationsCharts(metrics = {}) {
+      if (typeof window.Chart === 'undefined') {
+        return;
+      }
+
+      const statusDataset = Array.isArray(metrics.requests_by_status) && metrics.requests_by_status.length
+        ? metrics.requests_by_status
+        : [{ status: 'No traffic', requests: 1 }];
+      const endpointDataset = Array.isArray(metrics.top_endpoints) && metrics.top_endpoints.length
+        ? metrics.top_endpoints
+        : [{ endpoint: 'No endpoint traffic yet', requests: 0 }];
+
+      createOrUpdateChart('operations-request-status-chart', {
+        type: 'doughnut',
+        data: {
+          labels: statusDataset.map(item => item.status),
+          datasets: [{
+            data: statusDataset.map(item => item.requests),
+            backgroundColor: statusDataset.length > 1
+              ? ['#58a6ff', '#3fb950', '#a371f7', '#f77828', '#db61a2']
+              : ['#8b949e'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          ...getChartOptions('Request Status Distribution'),
+          cutout: '68%'
+        }
+      });
+
+      createOrUpdateChart('operations-endpoint-chart', {
+        type: 'bar',
+        data: {
+          labels: endpointDataset.map(item => item.endpoint),
+          datasets: [{
+            label: 'Requests',
+            data: endpointDataset.map(item => item.requests),
+            backgroundColor: '#58a6ff',
+            borderRadius: 8
+          }]
+        },
+        options: {
+          ...getChartOptions('Most Active Endpoints', 'Requests', 'Count'),
+          indexAxis: 'y',
+          plugins: {
+            ...getChartOptions('Most Active Endpoints', 'Requests', 'Count').plugins,
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
+    async function loadOperationsOverview() {
+      const statusBadge = document.getElementById('operations-overall-status');
+      if (!statusBadge) return;
+
+      statusBadge.textContent = 'Loading operations data...';
+      statusBadge.className = 'status-chip neutral';
+
+      try {
+        const response = await fetch('/api/v1/ops/overview');
+        if (!response.ok) {
+          throw new Error(`Operations overview request failed with status ${response.status}`);
+        }
+
+        const payload = await response.json();
+        const summary = payload.metrics?.summary || {};
+        const isHealthy = payload.health?.status === 'ok';
+
+        document.getElementById('operations-total-requests').textContent = Number(summary.total_requests || 0).toLocaleString();
+        document.getElementById('operations-avg-latency').textContent = `${summary.average_latency_ms || 0} ms`;
+        document.getElementById('operations-error-rate').textContent = `${summary.error_rate_percent || 0}%`;
+        document.getElementById('operations-uptime').textContent = formatOperationsDuration(summary.uptime_seconds);
+        document.getElementById('operations-service-version').textContent = `${payload.metrics?.service || 'service'} v${payload.metrics?.version || '-'}`;
+
+        renderOperationsLinks(payload.links || {});
+        renderOperationsDependencies(payload.health?.dependencies || {});
+        renderOperationsNotes(summary);
+        renderOperationsCharts(payload.metrics || {});
+
+        statusBadge.textContent = isHealthy ? 'All core dependencies are healthy' : 'Some dependencies need attention';
+        statusBadge.className = `status-chip ${isHealthy ? '' : 'down'}`;
+      } catch (error) {
+        console.error('Failed to load operations overview:', error);
+        statusBadge.textContent = 'Operations data unavailable';
+        statusBadge.className = 'status-chip down';
+        document.getElementById('operations-service-actions').innerHTML = '<div class="operations-empty">Open <code>/health</code> or try again after the API is reachable.</div>';
+        document.getElementById('operations-dependency-health').innerHTML = '<div class="operations-empty">Dependency status could not be loaded.</div>';
+        document.getElementById('operations-service-list').innerHTML = '<div class="operations-empty">Tool links are unavailable until the operations overview responds.</div>';
+        document.getElementById('operations-operator-notes').innerHTML = '<div class="operations-empty">The runtime monitoring API could not be reached.</div>';
+      }
     }
 
     function renderDemographicCharts(prefix, detections) {
@@ -2010,10 +2861,10 @@
 
     async function initializeApp() {
       document.querySelector('.loading-overlay').classList.add('active');
-      const token = localStorage.getItem('access_token');
+      const token = await getValidAccessToken();
 
       if (!token) {
-        showCustomAlert("Authentication token not found. Please log in.", "Authentication Error");
+        showCustomAlert("Your saved session could not be restored. Please log in again.", "Authentication Error");
         forceLogout();
         return;
       }
@@ -2033,9 +2884,7 @@
         if (!currentUser || !currentUser.email) {
           console.log("currentUser not found or invalid in localStorage. Fetching from /api/v1/users/me...");
 
-          const response = await fetch('/api/v1/users/me', {
-            headers: { Authorization: `Bearer ${token}` }
-          });
+          const response = await authenticatedFetch('/api/v1/users/me');
 
           if (!response.ok) {
             // If this fails, the token is truly invalid.
@@ -2063,35 +2912,17 @@
           fetchData("/api/v1/users/all")
         ]);
 
-        appState.facesMongo = Array.isArray(mongoRes?.data) ? mongoRes.data : (Array.isArray(mongoRes) ? mongoRes : []);
-        appState.allDetections = appState.facesMongo.flatMap(d => (d.detections || []).map(det => ({ ...det, timestamp: det.timestamp || d.start_timestamp, camera_id: d.camera_id, device_id: d.device_id }))).filter(d => d.timestamp);
         appState.fullRecord = Array.isArray(fullRes?.data) ? fullRes.data : (Array.isArray(fullRes) ? fullRes : []);
         appState.persons = Array.isArray(persRes?.data) ? persRes.data : (Array.isArray(persRes) ? persRes : []);
-        appState.tracking = Array.isArray(trackRes?.data) ? trackRes.data : (Array.isArray(trackRes) ? trackRes : []);
-        appState.users = usersRes.users || [];
-
-        const timestamps = appState.allDetections.map(d => d.timestamp).filter(Boolean);
-        const years = [...new Set(timestamps.map(t => new Date(t).getFullYear().toString()))];
-        const months = [...new Set(timestamps.map(t => t.slice(0, 7)))];
-        const devices = [...new Set(appState.allDetections.map(d => d.device_id).filter(Boolean))];
-        const cameras = [...new Set(appState.allDetections.map(d => d.camera_id).filter(Boolean))];
-        const locations = [...new Set(appState.allDetections.map(d => d.location).filter(Boolean))];
-
-        ['monthly-filter-year', 'monthly-filter-month', 'monthly-filter-device', 'monthly-filter-camera', 'daily-filter-device', 'daily-filter-camera', 'realtime-insights-filter-location', 'monthly-insights-filter-location', 'daily-insights-filter-location'].forEach(id => {
-          if (id.endsWith('year')) populateSelect(id, years, 'All Years');
-          else if (id.endsWith('month')) populateSelect(id, months, 'All Months');
-          else if (id.endsWith('device')) populateSelect(id, devices, 'All Devices');
-          else if (id.endsWith('camera')) populateSelect(id, cameras, 'All Cameras');
-          else if (id.endsWith('location')) populateSelect(id, locations, 'Select Location');
-        });
-
-        if (years.length > 0) document.getElementById('monthly-filter-year').value = years.sort().reverse()[0];
-        if (months.length > 0) document.getElementById('monthly-filter-month').value = months.sort().reverse()[0];
-        const allDates = [...new Set(timestamps.map(t => t.slice(0, 10)))].sort();
-        if (allDates.length > 0) document.getElementById('daily-filter-date').value = allDates[allDates.length - 1];
+        syncDetectionState(
+          Array.isArray(mongoRes?.data) ? mongoRes.data : (Array.isArray(mongoRes) ? mongoRes : []),
+          Array.isArray(trackRes?.data) ? trackRes.data : (Array.isArray(trackRes) ? trackRes : []),
+        );
+        appState.users = Array.isArray(usersRes?.users) ? usersRes.users : [];
+        refreshDetectionFilterOptions();
 
         renderStaticContent();
-        showPage(appSettings.landingPage || 'landing-page');
+        showPage(normalizePageId(requestedInitialTab) || normalizePageId(appSettings.landingPage) || 'landing-page');
 
       } catch (error) {
         console.error("Initialization Error:", error);
@@ -2224,15 +3055,14 @@
 
     async function fetchAndRenderUsers() {
       try {
-        const token = localStorage.getItem("access_token");
-
-        const response = await fetch("/api/v1/users/all", {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        });
+        const response = await authenticatedFetch("/api/v1/users/all");
 
         if (!response.ok) {
+          if (response.status === 401) {
+            showCustomAlert("Your session has expired. Please log in again.", "Authentication Error");
+            forceLogout();
+            return;
+          }
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const json = await response.json();
@@ -2242,6 +3072,12 @@
 
         renderUserManagementLayout();
         renderUserTable(appState.users);
+        const tableMeta = document.getElementById('user-table-meta');
+        if (tableMeta) {
+          tableMeta.textContent = currentUser?.role === 'Admin'
+            ? `${appState.users.length} user account${appState.users.length === 1 ? '' : 's'} loaded.`
+            : 'Showing your account profile. Admin-only actions remain locked until promotion.';
+        }
       } catch (err) {
         console.error("Error fetching users:", err);
         const container = document.getElementById('user-management-container');
@@ -2281,14 +3117,8 @@
       if (!confirmed) return;
 
       try {
-        // Get the user's token from local storage
-        const token = localStorage.getItem("access_token");
-
-        const res = await fetch(`/api/v1/users/${encodeURIComponent(email)}`, {
-          method: 'DELETE',
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
+        const res = await authenticatedFetch(`/api/v1/users/${encodeURIComponent(email)}`, {
+          method: 'DELETE'
         });
 
         const json = await res.json();
@@ -2317,14 +3147,10 @@
       };
 
       try {
-        // Get the user's token from local storage
-        const token = localStorage.getItem("access_token");
-
-        const res = await fetch(`/api/v1/users/${encodeURIComponent(currentUser.email)}`, {
+        const res = await authenticatedFetch(`/api/v1/users/${encodeURIComponent(currentUser.email)}`, {
           method: 'PUT',
           headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
+            "Content-Type": "application/json"
           },
           body: JSON.stringify(payload)
         });
@@ -2410,8 +3236,32 @@
       });
     }
 
-    function getRealtimeDetections() { const sixtyMinutesAgo = Date.now() - 3600000; return appState.allDetections.filter(d => d.timestamp && new Date(d.timestamp).getTime() >= sixtyMinutesAgo); }
+    function getRealtimeDetections() {
+      const detectionsWithTimestamps = appState.allDetections.filter(d => d.timestamp && !Number.isNaN(new Date(d.timestamp).getTime()));
+      if (detectionsWithTimestamps.length === 0) return [];
+
+      const latestTimestamp = Math.max(...detectionsWithTimestamps.map(d => new Date(d.timestamp).getTime()));
+      const sixtyMinutesBeforeLatest = latestTimestamp - 3600000;
+      return detectionsWithTimestamps.filter(d => new Date(d.timestamp).getTime() >= sixtyMinutesBeforeLatest);
+    }
     function updateRealtimeDashboard() { const detections = getRealtimeDetections(); updateDashboard('realtime', detections); }
+
+    async function refreshRealtimeData() {
+      if (!document.querySelector('#realtime-stats-page.active')) return;
+
+      console.log("Refreshing realtime data...");
+      const [mongoRes, trackingRes] = await Promise.all([
+        fetchData('/api/v1/faces-mongo/'),
+        fetchData('/api/v1/faces-mysql/tracking')
+      ]);
+
+      syncDetectionState(
+        Array.isArray(mongoRes?.data) ? mongoRes.data : (Array.isArray(mongoRes) ? mongoRes : []),
+        Array.isArray(trackingRes?.data) ? trackingRes.data : (Array.isArray(trackingRes) ? trackingRes : []),
+      );
+      refreshDetectionFilterOptions();
+      updateRealtimeDashboard();
+    }
 
     function renderGalleries() {
       const render = (containerId, data, templateFn) => {
@@ -2443,18 +3293,26 @@
     function renderLocationDeepDive(pagePrefix, allDetections) {
       const locationSelect = document.getElementById(`${pagePrefix}-insights-filter-location`);
       if (!locationSelect) return;
-      const location = locationSelect.value;
+      const selectedLocation = locationSelect.value;
       const container = document.getElementById(`${pagePrefix}-insights-location-deep-dive-container`);
       if (!container) return;
-      if (!location) { container.innerHTML = `<p style="text-align:center; color: var(--text-muted);">Please select a location to see detailed charts.</p>`; return; }
-      const detections = allDetections.filter(d => d.location === location);
+      const detections = selectedLocation
+        ? allDetections.filter(d => d.location === selectedLocation)
+        : allDetections;
+      const locationLabel = selectedLocation || 'All Locations';
+
+      if (detections.length === 0) {
+        container.innerHTML = `<p style="text-align:center; color: var(--text-muted);">No location insights are available for the current filters.</p>`;
+        return;
+      }
+
       container.innerHTML = `<div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));"><div class="stat-card"><h4>Total Visits</h4><p>${detections.length}</p></div><div class="stat-card"><h4>Avg. Attention</h4><p>${calculateAverage(detections, 'attention_time').toFixed(1)}s</p></div><div class="stat-card"><h4>Avg. Stay</h4><p>${calculateAverage(detections, 'length_of_stay').toFixed(1)}s</p></div></div><div class="chart-grid" style="margin-top: 20px;"><div><canvas id="${pagePrefix}-location-chart-gender"></canvas></div><div><canvas id="${pagePrefix}-location-chart-age"></canvas></div><div><canvas id="${pagePrefix}-location-chart-hourly"></canvas></div></div>`;
       const createPie = (prop, title) => ({ type: 'pie', data: { labels: Object.keys(countBy(detections, prop)), datasets: [{ data: Object.values(countBy(detections, prop)), backgroundColor: ['#667eea', '#f45196', '#764ba2', '#f5a623', '#50e3c2'] }] }, options: getChartOptions(title) });
-      createOrUpdateChart(`${pagePrefix}-location-chart-gender`, createPie('gender', `Gender @ ${location}`));
-      createOrUpdateChart(`${pagePrefix}-location-chart-age`, createPie('age', `Age @ ${location}`));
+      createOrUpdateChart(`${pagePrefix}-location-chart-gender`, createPie('gender', `Gender @ ${locationLabel}`));
+      createOrUpdateChart(`${pagePrefix}-location-chart-age`, createPie('age', `Age @ ${locationLabel}`));
       const hourlyData = Array(24).fill(0);
       detections.forEach(d => { if (d.timestamp) hourlyData[new Date(d.timestamp).getHours()]++; });
-      createOrUpdateChart(`${pagePrefix}-location-chart-hourly`, { type: 'line', data: { labels: Array.from({ length: 24 }, (_, i) => `${i}:00`), datasets: [{ label: 'Visitors', data: hourlyData, tension: 0.4, fill: true, borderColor: '#f5a623', backgroundColor: 'rgba(245, 166, 35, 0.2)' }] }, options: getChartOptions(`Hourly Traffic @ ${location}`, 'Hour', 'Count') });
+      createOrUpdateChart(`${pagePrefix}-location-chart-hourly`, { type: 'line', data: { labels: Array.from({ length: 24 }, (_, i) => `${i}:00`), datasets: [{ label: 'Visitors', data: hourlyData, tension: 0.4, fill: true, borderColor: '#f5a623', backgroundColor: 'rgba(245, 166, 35, 0.2)' }] }, options: getChartOptions(`Hourly Traffic @ ${locationLabel}`, 'Hour', 'Count') });
     }
 
     function renderCameraPerformance(pagePrefix, detections) {
@@ -2481,6 +3339,7 @@
       appSettings.theme = document.getElementById('theme-select').value;
       appSettings.itemsPerPage = document.getElementById('items-per-page-select').value;
       appSettings.landingPage = document.getElementById('landing-page-select').value;
+      appSettings.refreshInterval = document.getElementById('refresh-interval-select').value;
       localStorage.setItem('appSettings', JSON.stringify(appSettings));
       showCustomAlert('Settings saved!');
       document.getElementById('settings-modal').classList.remove('active');
@@ -2506,6 +3365,7 @@
       document.getElementById('theme-select').value = appSettings.theme;
       document.getElementById('items-per-page-select').value = appSettings.itemsPerPage;
       document.getElementById('landing-page-select').value = appSettings.landingPage;
+      document.getElementById('refresh-interval-select').value = appSettings.refreshInterval;
       updateAllChartsTheme();
     }
 
@@ -2514,9 +3374,12 @@
       if (!confirmed) return;
 
       try {
-        const token = localStorage.getItem('access_token');
-        // CORRECTED aPI Path
-        const res = await fetch('/api/v1/data/export', { headers: { 'Authorization': `Bearer ${token}` } });
+        const res = await authenticatedFetch('/api/v1/data/export');
+        if (res.status === 401) {
+          showCustomAlert("Your session has expired. Please log in again.", "Authentication Error");
+          forceLogout();
+          return;
+        }
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
         const data = await res.json();
@@ -2556,12 +3419,10 @@
       }
 
       try {
-        const token = localStorage.getItem('access_token');
-        const res = await fetch('/api/v1/users/change-password', {
+        const res = await authenticatedFetch('/api/v1/users/change-password', {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({ current_password: currentPassword, new_password: newPassword })
         });
@@ -2589,11 +3450,15 @@
       logsContainer.innerHTML = '<div class="loading-spinner" style="margin: 20px auto;"></div>';
 
       try {
-        const token = localStorage.getItem('access_token');
-        const res = await fetch('/api/v1/audit/logs', { headers: { 'Authorization': `Bearer ${token}` } });
+        const res = await authenticatedFetch('/api/v1/audit/logs');
 
         if (res.status === 403) {
           logsContainer.innerHTML = '<p style="color: var(--accent-pink);">Access denied. You must be an Admin to view audit logs.</p>';
+          return;
+        }
+        if (res.status === 401) {
+          showCustomAlert("Your session has expired. Please log in again.", "Authentication Error");
+          forceLogout();
           return;
         }
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
@@ -2618,16 +3483,8 @@
       }
     }
 
-    // Kept this function name to avoid breaking event listeners
-    async function forceLogout() {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('currentUser');
-      window.location.href = '/v1/login'; // Redirect to login page
-    }
-
     async function generatePdfReport(type) {
       console.log(`Generating ${type} PDF report...`);
-      const token = localStorage.getItem('access_token');
       let filters = {};
       let url = `/api/v1/reports/download?type=${type}`;
 
@@ -2649,9 +3506,8 @@
       }
 
       try {
-        const response = await fetch(url, {
-          method: 'GET',
-          headers: { 'Authorization': `Bearer ${token}` }
+        const response = await authenticatedFetch(url, {
+          method: 'GET'
         });
 
         // CORRECTED: Add specific check for 401 Unauthorized status
@@ -2837,14 +3693,10 @@
         }
 
         try {
-          // Get the user's token from local storage
-          const token = localStorage.getItem("access_token");
-
-          const res = await fetch(`/api/v1/users/${encodeURIComponent(email)}`, {
+          const res = await authenticatedFetch(`/api/v1/users/${encodeURIComponent(email)}`, {
             method: 'PUT',
             headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`
+              "Content-Type": "application/json"
             },
             body: JSON.stringify(payload)
           });
@@ -2866,21 +3718,6 @@
           showCustomAlert("Failed to update user.", "Error");
         }
       });
-
-      async function refreshRealtimeData() {
-        // Only refresh if the realtime page is active to save resources
-        if (!document.querySelector('#realtime-stats-page.active')) return;
-
-        console.log("Refreshing realtime data...");
-        const mongoRes = await fetchData('/api/v1/faces-mongo/');
-
-        // Update the app state with the latest data
-        appState.facesMongo = mongoRes.data || [];
-        appState.allDetections = (mongoRes.data || []).flatMap(d => (d.detections || []).map(det => ({ ...det, timestamp: det.timestamp || d.start_timestamp, camera_id: d.camera_id, device_id: d.device_id }))).filter(d => d.timestamp);
-
-        // Re-render the dashboard with the new data
-        updateRealtimeDashboard();
-      }
 
       initializeApp();
       // Set the interval to call the new refresh function every 60 seconds

@@ -4,6 +4,7 @@ from datetime import datetime
 
 import paho.mqtt.client as mqtt
 
+from api_client import save_face_track_via_api
 from db_utils import (
     fetch_registered_faces,
     get_next_track_id,
@@ -65,8 +66,32 @@ def on_message(client, userdata, msg):
 
         track_id = get_next_track_id()
         custom_key = f"{camera_id}_{timestamp.strftime('%Y%m%d%H%M%S')}_{track_id}"
-        save_face_track(track_id, unique_id, image_b64, embedding, timestamp, camera_id, custom_key)
-        LOGGER.info("[%s] Stored detection track_id=%s unique_id=%s custom_key=%s", filename, track_id, unique_id, custom_key)
+        if save_face_track_via_api(
+            track_id,
+            unique_id,
+            image_b64,
+            embedding,
+            timestamp,
+            camera_id,
+            custom_key,
+        ):
+            LOGGER.info(
+                "[%s] Stored detection via API track_id=%s unique_id=%s custom_key=%s",
+                filename,
+                track_id,
+                unique_id,
+                custom_key,
+            )
+        else:
+            LOGGER.warning("[%s] API tracking write failed, falling back to direct MySQL insert.", filename)
+            save_face_track(track_id, unique_id, image_b64, embedding, timestamp, camera_id, custom_key)
+            LOGGER.info(
+                "[%s] Stored detection via fallback track_id=%s unique_id=%s custom_key=%s",
+                filename,
+                track_id,
+                unique_id,
+                custom_key,
+            )
     except Exception as exc:
         LOGGER.exception("Failed to process live match MQTT payload: %s", exc)
 

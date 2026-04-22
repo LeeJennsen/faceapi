@@ -62,3 +62,20 @@ def init_mysql(app):
         logger.info("MySQL integration ready")
     except mysql.connector.Error as exc:
         logger.error("MySQL initialization failed: {}", exc)
+
+
+def check_mysql_connection() -> tuple[bool, str | None]:
+    try:
+        connection = get_mysql_connection()
+    except mysql.connector.Error as exc:
+        logger.warning("MySQL health check failed during connection acquisition: {}", exc)
+        return False, str(exc)
+
+    try:
+        connection.ping(reconnect=False, attempts=1, delay=0)
+        return True, None
+    except mysql.connector.Error as exc:
+        logger.warning("MySQL health check failed during ping: {}", exc)
+        return False, str(exc)
+    finally:
+        connection.close()

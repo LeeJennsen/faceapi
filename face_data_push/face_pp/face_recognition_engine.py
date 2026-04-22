@@ -6,6 +6,7 @@ from datetime import datetime
 
 import paho.mqtt.client as mqtt
 
+from api_client import save_face_track_via_api
 from db_utils import get_recent_embeddings, save_face_track
 from face_utils import base64_to_image, compare_faces, extract_aligned_face, get_face_embedding
 from runtime import connect_mqtt, get_logger
@@ -51,8 +52,20 @@ def on_message(client, userdata, msg):
                 LOGGER.info("[%s] Reusing unique_id %s (similarity %.2f)", filename, unique_id, similarity)
                 break
 
-        save_face_track(track_id, unique_id, image_b64, embedding, timestamp, camera_id, custom_track_key=None)
-        LOGGER.info("[%s] Stored detection track_id=%s unique_id=%s", filename, track_id, unique_id)
+        if save_face_track_via_api(
+            track_id,
+            unique_id,
+            image_b64,
+            embedding,
+            timestamp,
+            camera_id,
+            custom_track_key=None,
+        ):
+            LOGGER.info("[%s] Stored detection via API track_id=%s unique_id=%s", filename, track_id, unique_id)
+        else:
+            LOGGER.warning("[%s] API tracking write failed, falling back to direct MySQL insert.", filename)
+            save_face_track(track_id, unique_id, image_b64, embedding, timestamp, camera_id, custom_track_key=None)
+            LOGGER.info("[%s] Stored detection via fallback track_id=%s unique_id=%s", filename, track_id, unique_id)
     except Exception as exc:
         LOGGER.exception("Failed to process MQTT face payload: %s", exc)
 

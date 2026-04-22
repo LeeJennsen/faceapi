@@ -10,6 +10,7 @@ resources:
   - mongo.yaml
   - mqtt.yaml
   - api.yaml
+  - monitoring.yaml
   - face-md.yaml
   - face-pp.yaml
   - jobs.yaml
@@ -51,3 +52,25 @@ configMapGenerator:
   - name: mosquitto-config
     files:
       - mosquitto.conf=mosquitto.conf
+  - name: prometheus-config
+    files:
+      - prometheus.yml=prometheus.yml
+      - alerts.yml=alerts.yml
+  - name: alertmanager-config
+    files:
+      - alertmanager.yml=alertmanager.yml
+  - name: loki-config
+    files:
+      - loki-config.yml=loki-config.yml
+  - name: grafana-datasources
+    files:
+      - datasources.yml=grafana-datasources.yml
+  - name: grafana-dashboard-provider
+    files:
+      - dashboards.yml=grafana-dashboard-provider.yml
+  - name: grafana-dashboard-json
+    files:
+      - faceapi-overview.json=grafana-dashboard-faceapi-overview.json
+  - name: promtail-config
+    files:
+      - promtail-config.yml=promtail-config.yml

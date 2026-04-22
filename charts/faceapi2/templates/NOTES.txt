@@ -2,8 +2,10 @@
 {{- if .Values.ingress.enabled }}
   http{{ if .Values.ingress.tls }}s{{ end }}://{{ (index .Values.ingress.hosts 0).host }}/
 {{- else }}
-  kubectl port-forward svc/api 5000:5000
-  Then open http://localhost:5000
+  ./k8s/port-forward-local.ps1 -Namespace {{ .Release.Namespace }}
+  Or API only:
+    kubectl -n {{ .Release.Namespace }} port-forward svc/api 5000:5000
+  Then open http://localhost:5000 and, if you used the helper, the observability URLs on localhost too.
 {{- end }}
 
 2. Check workloads:

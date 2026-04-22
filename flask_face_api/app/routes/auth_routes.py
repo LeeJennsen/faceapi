@@ -9,7 +9,7 @@ from app.config import Config
 from app.db.mysql import mysql_cursor
 from app.services.audit_service import log_activity
 from app.services.bcrypt_service import hash_password, verify_password
-from app.services.jwt_service import generate_tokens
+from app.services.jwt_service import generate_access_token, generate_tokens, verify_token
 from app.services.otp_service import generate_and_store_otp, verify_otp
 from app.utils.serialization import serialize_datetime
 
@@ -38,6 +38,13 @@ login_model = api.model(
     {
         "email": fields.String(required=True),
         "password": fields.String(required=True),
+    },
+)
+
+refresh_model = api.model(
+    "RefreshToken",
+    {
+        "refresh_token": fields.String(required=True),
     },
 )
 
@@ -196,6 +203,45 @@ class Login(Resource):
             return {"message": "An internal error occurred during login."}, 500
 
 
+@api.route("/refresh")
+class Refresh(Resource):
+    @api.expect(refresh_model)
+    @api.doc(description="Exchange a valid refresh token for a new access token.")
+    def post(self):
+        data = _request_json()
+        refresh_token = data.get("refresh_token")
+
+        if not refresh_token:
+            return {"message": "Refresh token is required."}, 400
+
+        user_id = verify_token(refresh_token, expected_type="refresh")
+        if not user_id:
+            return {"message": "Invalid or expired refresh token."}, 401
+
+        try:
+            with mysql_cursor(dictionary=True) as (_, cursor):
+                cursor.execute(
+                    "SELECT id, name, email, role FROM users WHERE id=%s",
+                    (user_id,),
+                )
+                user = cursor.fetchone()
+
+            if not user:
+                return {"message": "User not found for this token."}, 404
+
+            return {
+                "access_token": generate_access_token(user["id"]),
+                "user": {
+                    "name": user["name"],
+                    "email": user["email"],
+                    "role": user["role"],
+                },
+            }, 200
+        except Exception:
+            logger.exception("Error refreshing session for user ID {}", user_id)
+            return {"message": "An internal error occurred while refreshing the session."}, 500
+
+
 @api.route("/forgot_password")
 class ForgotPassword(Resource):
     @api.expect(forgot_password_model)
@@ -300,13 +346,31 @@ class ChangePassword(Resource):
 
 @api.route("/all")
 class AllUsers(Resource):
-    @api.doc(description="Get all registered users with optional filters. Admin only.")
-    @admin_required
+    @api.doc(
+        description=(
+            "Get registered users. Admins receive the full list; non-admin users only receive "
+            "their own account so the dashboard can still render user management safely."
+        )
+    )
+    @token_required
     def get(self):
         email_filter = request.args.get("email")
         name_filter = request.args.get("name")
 
         try:
+            with mysql_cursor(dictionary=True) as (_, cursor):
+                cursor.execute(
+                    "SELECT id, name, email, role, last_login, created_at FROM users WHERE id=%s",
+                    (g.current_user_id,),
+                )
+                actor = cursor.fetchone()
+
+                if not actor:
+                    return {"message": "User not found for this token."}, 404
+
+                if actor["role"] != "Admin":
+                    return {"users": [_serialize_user_row(actor)]}, 200
+
             query = "SELECT id, name, email, role, last_login, created_at FROM users WHERE 1=1"
             params = []
 

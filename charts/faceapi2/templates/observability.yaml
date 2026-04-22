@@ -1,0 +1,376 @@
+{{- $full := include "faceapi2.fullname" . -}}
+{{- $secretName := include "faceapi2.secretName" . -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  selector:
+    app: redis
+  ports:
+    - name: redis
+      port: {{ .Values.service.redis.port }}
+      targetPort: {{ .Values.service.redis.port }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $full }}-redis
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount.redis }}
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: "{{ .Values.images.redis.repository }}:{{ .Values.images.redis.tag }}"
+          imagePullPolicy: {{ .Values.images.redis.pullPolicy }}
+          args: ["redis-server", "--appendonly", "yes"]
+          ports:
+            - containerPort: {{ .Values.service.redis.port }}
+              name: redis
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+          readinessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 15
+            periodSeconds: 20
+      volumes:
+        - name: redis-data
+          {{- if .Values.persistence.redis.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ $full }}-redis-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  selector:
+    app: prometheus
+  ports:
+    - name: http
+      port: {{ .Values.service.prometheus.port }}
+      targetPort: {{ .Values.service.prometheus.port }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $full }}-prometheus
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount.prometheus }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: "{{ .Values.images.prometheus.repository }}:{{ .Values.images.prometheus.tag }}"
+          imagePullPolicy: {{ .Values.images.prometheus.pullPolicy }}
+          args:
+            - --config.file=/etc/prometheus/prometheus.yml
+            - --storage.tsdb.path=/prometheus
+            - --web.enable-lifecycle
+          ports:
+            - containerPort: {{ .Values.service.prometheus.port }}
+              name: http
+          volumeMounts:
+            - name: prometheus-data
+              mountPath: /prometheus
+            - name: prometheus-config
+              mountPath: /etc/prometheus/prometheus.yml
+              subPath: prometheus.yml
+            - name: prometheus-config
+              mountPath: /etc/prometheus/alerts.yml
+              subPath: alerts.yml
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: {{ .Values.service.prometheus.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: {{ .Values.service.prometheus.port }}
+            initialDelaySeconds: 20
+            periodSeconds: 20
+      volumes:
+        - name: prometheus-data
+          {{- if .Values.persistence.prometheus.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ $full }}-prometheus-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: prometheus-config
+          configMap:
+            name: {{ $full }}-prometheus-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alertmanager
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  selector:
+    app: alertmanager
+  ports:
+    - name: http
+      port: {{ .Values.service.alertmanager.port }}
+      targetPort: {{ .Values.service.alertmanager.port }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $full }}-alertmanager
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount.alertmanager }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: alertmanager
+  template:
+    metadata:
+      labels:
+        app: alertmanager
+    spec:
+      containers:
+        - name: alertmanager
+          image: "{{ .Values.images.alertmanager.repository }}:{{ .Values.images.alertmanager.tag }}"
+          imagePullPolicy: {{ .Values.images.alertmanager.pullPolicy }}
+          args:
+            - --config.file=/etc/alertmanager/alertmanager.yml
+            - --storage.path=/alertmanager
+          ports:
+            - containerPort: {{ .Values.service.alertmanager.port }}
+              name: http
+          volumeMounts:
+            - name: alertmanager-data
+              mountPath: /alertmanager
+            - name: alertmanager-config
+              mountPath: /etc/alertmanager/alertmanager.yml
+              subPath: alertmanager.yml
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: {{ .Values.service.alertmanager.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: {{ .Values.service.alertmanager.port }}
+            initialDelaySeconds: 20
+            periodSeconds: 20
+      volumes:
+        - name: alertmanager-data
+          {{- if .Values.persistence.alertmanager.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ $full }}-alertmanager-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: alertmanager-config
+          configMap:
+            name: {{ $full }}-alertmanager-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loki
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  selector:
+    app: loki
+  ports:
+    - name: http
+      port: {{ .Values.service.loki.port }}
+      targetPort: {{ .Values.service.loki.port }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $full }}-loki
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount.loki }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: loki
+  template:
+    metadata:
+      labels:
+        app: loki
+    spec:
+      containers:
+        - name: loki
+          image: "{{ .Values.images.loki.repository }}:{{ .Values.images.loki.tag }}"
+          imagePullPolicy: {{ .Values.images.loki.pullPolicy }}
+          args:
+            - -config.file=/etc/loki/loki-config.yml
+          ports:
+            - containerPort: {{ .Values.service.loki.port }}
+              name: http
+          volumeMounts:
+            - name: loki-data
+              mountPath: /loki
+            - name: loki-config
+              mountPath: /etc/loki/loki-config.yml
+              subPath: loki-config.yml
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: {{ .Values.service.loki.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: {{ .Values.service.loki.port }}
+            initialDelaySeconds: 20
+            periodSeconds: 20
+      volumes:
+        - name: loki-data
+          {{- if .Values.persistence.loki.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ $full }}-loki-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: loki-config
+          configMap:
+            name: {{ $full }}-loki-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  selector:
+    app: grafana
+  ports:
+    - name: http
+      port: {{ .Values.service.grafana.port }}
+      targetPort: {{ .Values.service.grafana.port }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $full }}-grafana
+  labels:
+    {{- include "faceapi2.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount.grafana }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: "{{ .Values.images.grafana.repository }}:{{ .Values.images.grafana.tag }}"
+          imagePullPolicy: {{ .Values.images.grafana.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.grafana.port }}
+              name: http
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              value: "admin"
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: "admin"
+            - name: GF_AUTH_ANONYMOUS_ENABLED
+              value: "true"
+            - name: GF_AUTH_ANONYMOUS_ORG_ROLE
+              value: "Editor"
+            - name: GF_AUTH_DISABLE_LOGIN_FORM
+              value: "true"
+            - name: GF_USERS_ALLOW_SIGN_UP
+              value: "false"
+            - name: GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH
+              value: /etc/grafana/provisioning/dashboards-json/faceapi-overview.json
+          volumeMounts:
+            - name: grafana-data
+              mountPath: /var/lib/grafana
+            - name: grafana-datasources
+              mountPath: /etc/grafana/provisioning/datasources/datasources.yml
+              subPath: datasources.yml
+            - name: grafana-dashboard-provider
+              mountPath: /etc/grafana/provisioning/dashboards/dashboards.yml
+              subPath: dashboards.yml
+            - name: grafana-dashboard-json
+              mountPath: /etc/grafana/provisioning/dashboards-json/faceapi-overview.json
+              subPath: faceapi-overview.json
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: {{ .Values.service.grafana.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: {{ .Values.service.grafana.port }}
+            initialDelaySeconds: 20
+            periodSeconds: 20
+      volumes:
+        - name: grafana-data
+          {{- if .Values.persistence.grafana.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ $full }}-grafana-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: grafana-datasources
+          configMap:
+            name: {{ $full }}-grafana-datasources
+        - name: grafana-dashboard-provider
+          configMap:
+            name: {{ $full }}-grafana-dashboard-provider
+        - name: grafana-dashboard-json
+          configMap:
+            name: {{ $full }}-grafana-dashboard-json

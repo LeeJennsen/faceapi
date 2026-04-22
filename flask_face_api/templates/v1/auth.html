@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>
+    {% if initial_mode == "register" %}
+    Create Account
+    {% elif initial_mode == "forgot" %}
+    Reset Password
+    {% else %}
+    Sign In
+    {% endif %}
+    | FaceAPI2
+  </title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='v1/auth-shell.css') }}">
+</head>
+
+<body class="theme-dark">
+  <main class="auth-page" data-auth-root data-initial-mode="{{ initial_mode | default('login') }}">
+    <div class="auth-toolbar">
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+        <i class="fas fa-sun"></i>
+      </button>
+    </div>
+
+    <section class="auth-card" aria-label="Authentication">
+      <div class="auth-brand">
+        <div class="brand-mark" aria-hidden="true">F2</div>
+        <div class="brand-copy">
+          <p class="brand-label">FaceAPI2</p>
+          <h1>Trusted access for the FaceAPI2 control center.</h1>
+          <p class="brand-description">Secure sign-in, account creation, and password recovery in one clean workflow.</p>
+        </div>
+      </div>
+
+      <div class="auth-tabs" role="tablist" aria-label="Authentication views">
+        <button type="button" class="auth-tab" data-auth-target="login" role="tab">Sign In</button>
+        <button type="button" class="auth-tab" data-auth-target="register" role="tab">Create Account</button>
+        <button type="button" class="auth-tab" data-auth-target="forgot" role="tab">Forgot Password</button>
+      </div>
+
+      <section class="auth-panel" data-auth-panel="login" aria-labelledby="login-title">
+        <div class="panel-heading">
+          <h2 id="login-title">Welcome back</h2>
+          <p>Use your FaceAPI2 account to sign in and continue to the dashboard.</p>
+        </div>
+
+        <form id="loginForm" class="auth-form" novalidate>
+          <div class="field">
+            <label for="login-email">Email</label>
+            <div class="input-shell">
+              <i class="fas fa-envelope input-icon" aria-hidden="true"></i>
+              <input type="email" id="login-email" name="email" placeholder="name@company.com" autocomplete="email" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-header">
+              <label for="login-password">Password</label>
+              <button type="button" class="text-link inline-link" data-auth-target="forgot">Forgot password?</button>
+            </div>
+            <div class="input-shell">
+              <i class="fas fa-lock input-icon" aria-hidden="true"></i>
+              <input type="password" id="login-password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+              <button type="button" class="password-toggle" data-password-toggle aria-label="Toggle password visibility">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <label class="check-row" for="login-captcha">
+            <input type="checkbox" id="login-captcha" name="captcha" required>
+            <span>Confirm this sign-in request is initiated by an authorized operator.</span>
+          </label>
+
+          <button type="submit" class="primary-btn" id="loginBtn">Sign In to Dashboard</button>
+        </form>
+
+        <div class="panel-links">
+          <span>Need access?</span>
+          <button type="button" class="text-link" data-auth-target="register">Create account</button>
+        </div>
+      </section>
+
+      <section class="auth-panel" data-auth-panel="register" aria-labelledby="register-title" hidden>
+        <div class="panel-heading">
+          <h2 id="register-title">Create your operator profile</h2>
+          <p>Set up your account, verify your email OTP, and continue into FaceAPI2.</p>
+        </div>
+
+        <form id="regForm" class="auth-form" novalidate>
+          <div class="field">
+            <label for="register-name">Full Name</label>
+            <div class="input-shell">
+              <i class="fas fa-user input-icon" aria-hidden="true"></i>
+              <input id="register-name" name="name" placeholder="Operator name" autocomplete="name" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="register-email">Email</label>
+            <div class="input-shell">
+              <i class="fas fa-envelope input-icon" aria-hidden="true"></i>
+              <input type="email" id="register-email" name="email" placeholder="name@company.com" autocomplete="email" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="register-password">Password</label>
+            <div class="input-shell">
+              <i class="fas fa-lock input-icon" aria-hidden="true"></i>
+              <input type="password" id="register-password" name="password" placeholder="Create a strong password" autocomplete="new-password" required>
+              <button type="button" class="password-toggle" data-password-toggle aria-label="Toggle password visibility">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <div class="password-strength">
+              <div id="register-strength-meter" class="password-strength-bars" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <p id="register-strength-label" class="field-note">Use 10+ characters with mixed case, numbers, and symbols.</p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="register-confirm-password">Confirm Password</label>
+            <div class="input-shell">
+              <i class="fas fa-check-circle input-icon" aria-hidden="true"></i>
+              <input type="password" id="register-confirm-password" name="confirm_password" placeholder="Repeat your password" autocomplete="new-password" required>
+              <button type="button" class="password-toggle" data-password-toggle aria-label="Toggle password visibility">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="register-otp">Email OTP</label>
+            <div class="inline-action">
+              <input type="text" id="register-otp" name="otp" placeholder="Enter the 6-digit code" inputmode="numeric" maxlength="6" required>
+              <button type="button" class="secondary-btn" id="sendOtpBtn" disabled>Send OTP</button>
+            </div>
+            <p class="field-note">The OTP will be sent to the email entered above.</p>
+          </div>
+
+          <label class="check-row" for="register-captcha">
+            <input type="checkbox" id="register-captcha" name="captcha" required>
+            <span>I am authorized to create this account and understand it may appear in audit activity.</span>
+          </label>
+
+          <button type="submit" class="primary-btn" id="registerBtn">Create Account</button>
+        </form>
+
+        <div class="panel-links">
+          <span>Already have an account?</span>
+          <button type="button" class="text-link" data-auth-target="login">Sign in</button>
+        </div>
+      </section>
+
+      <section class="auth-panel" data-auth-panel="forgot" aria-labelledby="forgot-title" hidden>
+        <div class="panel-heading">
+          <h2 id="forgot-title">Reset your password</h2>
+          <p>Request a recovery code, verify the OTP, and set a new password.</p>
+        </div>
+
+        <div class="step-tray" aria-label="Recovery steps">
+          <span class="step-pill is-active" data-step-indicator="1">1. Email</span>
+          <span class="step-pill" data-step-indicator="2">2. OTP</span>
+          <span class="step-pill" data-step-indicator="3">3. Password</span>
+        </div>
+
+        <form id="resetPasswordForm" class="auth-form" novalidate>
+          <section class="step-panel" data-step-panel="1">
+            <div class="field">
+              <label for="recovery-email">Account Email</label>
+              <div class="input-shell">
+                <i class="fas fa-envelope input-icon" aria-hidden="true"></i>
+                <input type="email" id="recovery-email" name="email" placeholder="name@company.com" autocomplete="email" required>
+              </div>
+            </div>
+            <button type="button" class="primary-btn" id="sendRecoveryOtpBtn">Send Recovery Code</button>
+          </section>
+
+          <section class="step-panel" data-step-panel="2" hidden>
+            <div class="field">
+              <label for="reset-otp">Recovery OTP</label>
+              <div class="inline-action">
+                <input type="text" id="reset-otp" name="otp" placeholder="Enter the 6-digit code" inputmode="numeric" maxlength="6" required>
+                <button type="button" class="secondary-btn" id="resendOtpBtn">Resend Code</button>
+              </div>
+            </div>
+            <button type="button" class="primary-btn" id="verifyOtpBtn">Verify OTP</button>
+          </section>
+
+          <section class="step-panel" data-step-panel="3" hidden>
+            <div class="field">
+              <label for="new_password">New Password</label>
+              <div class="input-shell">
+                <i class="fas fa-lock input-icon" aria-hidden="true"></i>
+                <input type="password" id="new_password" name="new_password" placeholder="Create a new password" autocomplete="new-password" required>
+                <button type="button" class="password-toggle" data-password-toggle aria-label="Toggle password visibility">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+              <div class="password-strength">
+                <div id="reset-strength-meter" class="password-strength-bars" aria-hidden="true">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+                <p id="reset-strength-label" class="field-note">Use 10+ characters with mixed case, numbers, and symbols.</p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="confirm_password">Confirm New Password</label>
+              <div class="input-shell">
+                <i class="fas fa-check-circle input-icon" aria-hidden="true"></i>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="Repeat the new password" autocomplete="new-password" required>
+                <button type="button" class="password-toggle" data-password-toggle aria-label="Toggle password visibility">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="primary-btn" id="resetPasswordBtn">Reset Password</button>
+          </section>
+        </form>
+
+        <div class="panel-links">
+          <span>Remembered it?</span>
+          <button type="button" class="text-link" data-auth-target="login">Back to sign in</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div id="auth-toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="{{ url_for('static', filename='v1/auth-shell.js') }}"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const authUi = window.FaceAPIAuth;
+      const root = document.querySelector("[data-auth-root]");
+      const tabButtons = Array.from(document.querySelectorAll("[data-auth-target]"));
+      const panelButtons = tabButtons.filter(function (button) {
+        return button.closest(".auth-tabs") || button.closest(".panel-links") || button.closest(".field-header");
+      });
+      const panels = Array.from(document.querySelectorAll("[data-auth-panel]"));
+      const stepIndicators = Array.from(document.querySelectorAll("[data-step-indicator]"));
+      const stepPanels = Array.from(document.querySelectorAll("[data-step-panel]"));
+      const loginForm = document.getElementById("loginForm");
+      const registerForm = document.getElementById("regForm");
+      const resetForm = document.getElementById("resetPasswordForm");
+      const sendOtpButton = document.getElementById("sendOtpBtn");
+      const registerButton = document.getElementById("registerBtn");
+      const loginButton = document.getElementById("loginBtn");
+      const recoverySendButton = document.getElementById("sendRecoveryOtpBtn");
+      const resendOtpButton = document.getElementById("resendOtpBtn");
+      const verifyOtpButton = document.getElementById("verifyOtpBtn");
+      const resetPasswordButton = document.getElementById("resetPasswordBtn");
+      const registerEmailField = document.getElementById("register-email");
+      const registerPasswordField = document.getElementById("register-password");
+      const resetPasswordField = document.getElementById("new_password");
+      const recoveryEmailField = document.getElementById("recovery-email");
+      const recoveryOtpField = document.getElementById("reset-otp");
+      let registerCooldownCancel = null;
+      let recoveryCooldownCancel = null;
+      let recoveryEmail = "";
+      let verifiedOtp = "";
+
+      authUi.bindStrengthMeter(registerPasswordField, "#register-strength-meter span", "#register-strength-label");
+      authUi.bindStrengthMeter(resetPasswordField, "#reset-strength-meter span", "#reset-strength-label");
+
+      function focusFirstField(mode) {
+        const focusTargets = {
+          login: document.getElementById("login-email"),
+          register: document.getElementById("register-name"),
+          forgot: document.getElementById("recovery-email")
+        };
+        const target = focusTargets[mode];
+        if (target) {
+          window.requestAnimationFrame(function () {
+            target.focus();
+          });
+        }
+      }
+
+      function switchMode(mode, options) {
+        const shouldFocus = !options || options.focus !== false;
+
+        panels.forEach(function (panel) {
+          panel.hidden = panel.dataset.authPanel !== mode;
+        });
+
+        panelButtons.forEach(function (button) {
+          const isActive = button.dataset.authTarget === mode;
+          button.classList.toggle("is-active", isActive);
+          if (button.closest(".auth-tabs")) {
+            button.setAttribute("aria-selected", isActive ? "true" : "false");
+            button.tabIndex = isActive ? 0 : -1;
+          }
+        });
+
+        if (mode === "forgot") {
+          setRecoveryStep(1);
+        }
+
+        if (shouldFocus) {
+          focusFirstField(mode);
+        }
+      }
+
+      function setRecoveryStep(stepNumber) {
+        stepIndicators.forEach(function (indicator) {
+          indicator.classList.toggle("is-active", Number(indicator.dataset.stepIndicator) === stepNumber);
+        });
+
+        stepPanels.forEach(function (panel) {
+          panel.hidden = Number(panel.dataset.stepPanel) !== stepNumber;
+        });
+      }
+
+      panelButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          switchMode(button.dataset.authTarget);
+        });
+      });
+
+      registerEmailField.addEventListener("input", function () {
+        sendOtpButton.disabled = !authUi.validateEmail(registerEmailField.value.trim());
+      });
+
+      loginForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const email = loginForm.email.value.trim().toLowerCase();
+        const password = loginForm.password.value;
+
+        if (!authUi.validateEmail(email)) {
+          authUi.showToast("Enter a valid email address before signing in.", "error");
+          return;
+        }
+
+        if (!password) {
+          authUi.showToast("Enter your password to continue.", "error");
+          return;
+        }
+
+        if (!loginForm.captcha.checked) {
+          authUi.showToast("Confirm the operator verification check before signing in.", "error");
+          return;
+        }
+
+        const resetButton = authUi.createButtonState(loginButton, "Signing in...");
+
+        try {
+          const response = await fetch("/api/v1/users/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+          });
+          const payload = await response.json();
+
+          if (response.ok && payload.access_token && payload.user) {
+            localStorage.setItem("access_token", payload.access_token);
+            if (payload.refresh_token) {
+              localStorage.setItem("refresh_token", payload.refresh_token);
+            }
+            localStorage.setItem("currentUser", JSON.stringify(payload.user));
+            authUi.showToast("Authentication successful. Loading the dashboard now.", "success");
+            window.setTimeout(function () {
+              window.location.href = "/v1/dashboard";
+            }, 600);
+            return;
+          }
+
+          if (response.status === 429) {
+            authUi.showToast("Too many login attempts. Please wait and try again shortly.", "error");
+            return;
+          }
+
+          authUi.showToast(payload.message || "Sign-in failed. Check your credentials and try again.", "error");
+        } catch (_error) {
+          authUi.showToast("The platform could not reach the login service. Please try again.", "error");
+        } finally {
+          resetButton();
+        }
+      });
+
+      sendOtpButton.addEventListener("click", async function () {
+        const email = registerEmailField.value.trim().toLowerCase();
+        let cooldownStarted = false;
+
+        if (!authUi.validateEmail(email)) {
+          authUi.showToast("Enter a valid email address before requesting an OTP.", "error");
+          return;
+        }
+
+        const resetButton = authUi.createButtonState(sendOtpButton, "Sending...");
+
+        try {
+          const response = await fetch("/api/v1/users/send-otp", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email })
+          });
+          const payload = await response.json();
+
+          if (!response.ok) {
+            authUi.showToast(payload.message || "OTP request failed. Please try again.", "error");
+            return;
+          }
+
+          if (registerCooldownCancel) {
+            registerCooldownCancel();
+          }
+
+          cooldownStarted = true;
+          authUi.showToast(payload.message || "OTP sent successfully.", "success");
+          registerCooldownCancel = authUi.startCooldown(sendOtpButton, 30, function (remaining) {
+            return remaining > 0 ? "Resend in " + remaining + "s" : "Resend OTP";
+          });
+        } catch (_error) {
+          authUi.showToast("The platform could not send the OTP right now. Please try again.", "error");
+        } finally {
+          if (!cooldownStarted) {
+            resetButton();
+          }
+        }
+      });
+
+      registerForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const strength = authUi.computePasswordStrength(registerPasswordField.value);
+        const email = registerForm.email.value.trim().toLowerCase();
+
+        if (!registerForm.name.value.trim()) {
+          authUi.showToast("Enter the operator name before continuing.", "error");
+          return;
+        }
+
+        if (!authUi.validateEmail(email)) {
+          authUi.showToast("Enter a valid email address before registering.", "error");
+          return;
+        }
+
+        if (strength.score <= 2) {
+          authUi.showToast("Choose a stronger password before registration.", "error");
+          return;
+        }
+
+        if (registerForm.password.value !== registerForm.confirm_password.value) {
+          authUi.showToast("The password confirmation does not match.", "error");
+          return;
+        }
+
+        if (!/^\d{6}$/.test(registerForm.otp.value.trim())) {
+          authUi.showToast("Enter the 6-digit OTP that was sent to your email.", "error");
+          return;
+        }
+
+        if (!registerForm.captcha.checked) {
+          authUi.showToast("Complete the access acknowledgment before registering.", "error");
+          return;
+        }
+
+        const resetButton = authUi.createButtonState(registerButton, "Creating account...");
+
+        try {
+          const response = await fetch("/api/v1/users/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: registerForm.name.value.trim(),
+              email: email,
+              password: registerForm.password.value,
+              otp: registerForm.otp.value.trim()
+            })
+          });
+          const payload = await response.json();
+
+          if (!response.ok) {
+            authUi.showToast(payload.message || "Registration failed. Please review the inputs and try again.", "error");
+            return;
+          }
+
+          if (registerCooldownCancel) {
+            registerCooldownCancel();
+            registerCooldownCancel = null;
+          }
+
+          registerForm.reset();
+          sendOtpButton.disabled = true;
+          authUi.showToast("Registration complete. You can sign in now.", "success");
+          switchMode("login");
+        } catch (_error) {
+          authUi.showToast("The platform could not create the account right now. Please try again.", "error");
+        } finally {
+          resetButton();
+        }
+      });
+
+      async function requestRecoveryOtp(button, workingLabel) {
+        const email = recoveryEmailField.value.trim().toLowerCase();
+        let cooldownStarted = false;
+
+        if (!authUi.validateEmail(email)) {
+          authUi.showToast("Enter a valid email address before requesting a recovery code.", "error");
+          return;
+        }
+
+        const resetButton = authUi.createButtonState(button, workingLabel);
+
+        try {
+          const response = await fetch("/api/v1/users/forgot_password", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email })
+          });
+          const payload = await response.json();
+
+          if (!response.ok) {
+            authUi.showToast(payload.message || "Recovery code request failed. Please try again.", "error");
+            return;
+          }
+
+          recoveryEmail = email;
+          verifiedOtp = "";
+          setRecoveryStep(2);
+          authUi.showToast(payload.message || "Recovery code sent.", "success");
+
+          if (recoveryCooldownCancel) {
+            recoveryCooldownCancel();
+          }
+
+          cooldownStarted = true;
+          recoveryCooldownCancel = authUi.startCooldown(resendOtpButton, 30, function (remaining) {
+            return remaining > 0 ? "Resend in " + remaining + "s" : "Resend Code";
+          });
+        } catch (_error) {
+          authUi.showToast("The recovery service could not be reached. Please try again.", "error");
+        } finally {
+          if (!cooldownStarted) {
+            resetButton();
+          }
+        }
+      }
+
+      recoverySendButton.addEventListener("click", function () {
+        requestRecoveryOtp(recoverySendButton, "Sending...");
+      });
+
+      resendOtpButton.addEventListener("click", function () {
+        requestRecoveryOtp(resendOtpButton, "Resending...");
+      });
+
+      verifyOtpButton.addEventListener("click", function () {
+        const otp = recoveryOtpField.value.trim();
+        if (!/^\d{6}$/.test(otp)) {
+          authUi.showToast("Enter the 6-digit recovery OTP before continuing.", "error");
+          return;
+        }
+
+        verifiedOtp = otp;
+        setRecoveryStep(3);
+        resetPasswordField.focus();
+      });
+
+      resetForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const strength = authUi.computePasswordStrength(resetPasswordField.value);
+        if (!recoveryEmail) {
+          authUi.showToast("Start the recovery flow by requesting a code first.", "error");
+          setRecoveryStep(1);
+          return;
+        }
+
+        if (!verifiedOtp) {
+          authUi.showToast("Verify the OTP before setting a new password.", "error");
+          setRecoveryStep(2);
+          return;
+        }
+
+        if (strength.score <= 2) {
+          authUi.showToast("Choose a stronger password before resetting access.", "error");
+          return;
+        }
+
+        if (resetForm.new_password.value !== resetForm.confirm_password.value) {
+          authUi.showToast("The password confirmation does not match.", "error");
+          return;
+        }
+
+        const resetButton = authUi.createButtonState(resetPasswordButton, "Resetting password...");
+
+        try {
+          const response = await fetch("/api/v1/users/reset-password", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: recoveryEmail,
+              otp: verifiedOtp,
+              new_password: resetForm.new_password.value
+            })
+          });
+          const payload = await response.json();
+
+          if (!response.ok) {
+            authUi.showToast(payload.message || "Password reset failed. Please verify the OTP and try again.", "error");
+            return;
+          }
+
+          if (recoveryCooldownCancel) {
+            recoveryCooldownCancel();
+            recoveryCooldownCancel = null;
+          }
+
+          recoveryEmail = "";
+          verifiedOtp = "";
+          resetForm.reset();
+          setRecoveryStep(1);
+          authUi.showToast("Password updated. You can sign in now.", "success");
+          switchMode("login");
+        } catch (_error) {
+          authUi.showToast("The platform could not reset the password right now. Please try again.", "error");
+        } finally {
+          resetButton();
+        }
+      });
+
+      switchMode(root.dataset.initialMode || "login", { focus: false });
+    });
+  </script>
+</body>
+
+</html>

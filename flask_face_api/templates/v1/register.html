@@ -3,606 +3,246 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Register · Face API</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Create Account | FaceAPI2</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    /* --- UNIFIED AUTH DESIGN SYSTEM --- */
-    :root {
-      --bg-color: #f4f7f9;
-      --text-color: #1a202c;
-      --text-muted: #718096;
-      --primary-color: #4f46e5;
-      --secondary-color: #7c3aed;
-      --card-bg: #ffffff;
-      --input-bg: #fdfdff;
-      --input-border: #e2e8f0;
-      --input-focus-border: var(--primary-color);
-      --gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      --strength-weak: #ef4444;
-      --strength-medium: #f59e0b;
-      --strength-strong: #10b981;
-      --shadow-color: rgba(79, 70, 229, 0.2);
-    }
-
-    body.dark {
-      --bg-color: #121212;
-      --text-color: #e5e7eb;
-      --text-muted: #9ca3af;
-      --primary-color: #6366f1;
-      --secondary-color: #a78bfa;
-      --card-bg: #1e1e1e;
-      --input-bg: #2a2a2a;
-      --input-border: #4b5563;
-      --input-focus-border: var(--primary-color);
-      --shadow-color: rgba(99, 102, 241, 0.3);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-    }
-
-    html {
-      font-size: 16px;
-    }
-
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-    }
-
-    .card {
-      background: var(--card-bg);
-      padding: 2.5rem;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-      border: 1px solid var(--input-border);
-      width: 100%;
-      max-width: 450px;
-      position: relative;
-      text-align: center;
-      animation: fadeIn 0.5s ease-out;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .toggle-theme {
-      position: absolute;
-      top: 1.5rem;
-      right: 1.5rem;
-      background: var(--input-bg);
-      border: 1px solid var(--input-border);
-      color: var(--text-muted);
-      font-size: 1rem;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .toggle-theme:hover {
-      color: var(--text-color);
-    }
-
-    .gradient-text {
-      background: var(--gradient);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 0.5rem;
-      font-weight: 700;
-    }
-
-    p {
-      color: var(--text-muted);
-      margin-bottom: 2rem;
-      font-size: 1rem;
-    }
-
-    .input-group {
-      position: relative;
-      margin-bottom: 1.25rem;
-      text-align: left;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px 15px 12px 45px;
-      border: 1px solid var(--input-border);
-      border-radius: 10px;
-      background: var(--input-bg);
-      color: var(--text-color);
-      font-size: 1rem;
-      font-family: 'Inter', sans-serif;
-    }
-
-    input:focus {
-      outline: none;
-      border-color: var(--input-focus-border);
-      box-shadow: 0 0 0 3px var(--shadow-color);
-    }
-
-    .input-group>i:first-child {
-      position: absolute;
-      left: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      pointer-events: none;
-    }
-
-    .input-group .password-toggle {
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      cursor: pointer;
-      pointer-events: all;
-    }
-
-    .input-group .password-toggle:hover {
-      color: var(--text-color);
-    }
-
-
-    .otp-group {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .otp-group input {
-      flex-grow: 1;
-    }
-
-    .action-btn {
-      width: 100%;
-      padding: 14px;
-      margin-top: 1.5rem;
-      background: var(--gradient);
-      color: #fff;
-      border: none;
-      font-size: 1rem;
-      font-weight: 600;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .action-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 7px 20px var(--shadow-color);
-    }
-
-    .action-btn:disabled {
-      background: var(--text-muted);
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .send-otp-btn {
-      padding: 12px 15px;
-      background: var(--secondary-color);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      white-space: nowrap;
-      font-weight: 500;
-      transition: background-color 0.2s ease;
-    }
-
-    .send-otp-btn:hover:not(:disabled) {
-      background: var(--primary-color);
-    }
-
-    .send-otp-btn:disabled {
-      background-color: var(--text-muted);
-      cursor: not-allowed;
-      opacity: 0.7;
-    }
-
-    .foot {
-      text-align: center;
-      margin-top: 2rem;
-    }
-
-    .foot a {
-      color: var(--primary-color);
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .foot a:hover {
-      text-decoration: underline;
-    }
-
-    .password-strength {
-      display: flex;
-      gap: 5px;
-      height: 6px;
-      width: 100%;
-      border-radius: 6px;
-      margin-top: -10px;
-      margin-bottom: 5px;
-      overflow: hidden;
-    }
-
-    .password-strength-bar {
-      flex: 1;
-      height: 100%;
-      background: var(--input-border);
-      border-radius: 3px;
-      transition: background-color 0.4s;
-    }
-
-    .password-strength-bar.filled {
-      background-color: var(--strength-weak);
-    }
-
-    .password-strength-bar.filled.medium {
-      background-color: var(--strength-medium);
-    }
-
-    .password-strength-bar.filled.strong {
-      background-color: var(--strength-strong);
-    }
-
-
-    #strength-text {
-      text-align: right;
-      font-size: 0.8em;
-      font-weight: 500;
-      margin-bottom: 10px;
-      height: 1em;
-      transition: color 0.4s;
-    }
-
-    #strength-text.weak {
-      color: var(--strength-weak);
-    }
-
-    #strength-text.medium {
-      color: var(--strength-medium);
-    }
-
-    #strength-text.strong {
-      color: var(--strength-strong);
-    }
-
-    .captcha-group {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 10px;
-      border: 1px solid var(--input-border);
-      border-radius: 10px;
-      margin-top: 1.5rem;
-      cursor: pointer;
-      background-color: var(--input-bg);
-    }
-
-    .captcha-group input {
-      width: 1rem;
-      height: 1rem;
-      margin-right: 10px;
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: var(--primary-color);
-      color: #fff;
-      padding: 1rem 1.5rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      z-index: 100;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeInToast 0.5s forwards, fadeOutToast 0.5s 3.5s forwards;
-    }
-
-    @keyframes fadeInToast {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes fadeOutToast {
-      from {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      to {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='v1/auth-shell.css') }}">
 </head>
 
-<body>
-  <div class="card">
-    <button class="toggle-theme"><i class="fas fa-moon"></i></button>
-    <h2 class="gradient-text">Create Your Account</h2>
-    <p>Join us and start analyzing facial data with ease.</p>
-    <form id="regForm">
-      <div class="input-group">
-        <i class="fas fa-user"></i>
-        <input name="name" placeholder="Full Name" required>
-      </div>
-      <div class="input-group">
-        <i class="fas fa-envelope"></i>
-        <input type="email" name="email" placeholder="Email" required>
-      </div>
-      <div class="input-group">
-        <i class="fas fa-lock"></i>
-        <input type="password" id="password" name="password" placeholder="Password" required>
-        <span class="password-toggle"><i class="fas fa-eye"></i></span>
-      </div>
-      <div class="password-strength">
-        <div class="password-strength-bar"></div>
-        <div class="password-strength-bar"></div>
-        <div class="password-strength-bar"></div>
-      </div>
-      <div id="strength-text"></div>
-      <div class="input-group">
-        <i class="fas fa-check-circle"></i>
-        <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-        <span class="password-toggle"><i class="fas fa-eye"></i></span>
-      </div>
-      <div class="input-group otp-group">
-        <i class="fas fa-key"></i>
-        <input type="text" name="otp" placeholder="Email OTP" required>
-        <button type="button" class="send-otp-btn" id="sendOtpBtn" disabled>Send OTP</button>
-      </div>
-      <div class="captcha-group">
-        <input type="checkbox" id="captcha" name="captcha" required>
-        <label for="captcha">I'm not a robot</label>
-      </div>
-      <button type="submit" class="action-btn">Register</button>
-    </form>
-    <div class="foot">Already have an account? <a href="/v1/login">Login Now</a></div>
-  </div>
+<body class="theme-dark">
+  <main class="auth-page">
+    <div class="auth-toolbar">
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+        <i class="fas fa-sun"></i>
+      </button>
+    </div>
 
+    <section class="auth-card" aria-label="Register">
+      <div class="auth-brand">
+        <div class="brand-mark" aria-hidden="true">F2</div>
+        <div class="brand-copy">
+          <p class="brand-label">FaceAPI2</p>
+          <h1>Trusted access for the FaceAPI2 control center.</h1>
+          <p class="brand-description">Use a dedicated registration page so new operators can focus on account setup without the login and recovery flows competing for attention.</p>
+        </div>
+      </div>
+
+      <section class="auth-panel" aria-labelledby="register-title">
+        <div class="panel-heading">
+          <h2 id="register-title">Create your operator profile</h2>
+          <p>Set up your account, verify your email OTP, and continue into FaceAPI2.</p>
+        </div>
+
+        <form id="regForm" class="auth-form" novalidate>
+          <div class="field">
+            <label for="register-name">Full Name</label>
+            <div class="input-shell">
+              <i class="fas fa-user input-icon" aria-hidden="true"></i>
+              <input id="register-name" name="name" placeholder="Operator name" autocomplete="name" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="register-email">Email</label>
+            <div class="input-shell">
+              <i class="fas fa-envelope input-icon" aria-hidden="true"></i>
+              <input type="email" id="register-email" name="email" placeholder="name@company.com" autocomplete="email" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="register-password">Password</label>
+            <div class="input-shell">
+              <i class="fas fa-lock input-icon" aria-hidden="true"></i>
+              <input type="password" id="register-password" name="password" placeholder="Create a strong password" autocomplete="new-password" required>
+              <button type="button" class="password-toggle" data-password-toggle aria-label="Toggle password visibility">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <div class="password-strength">
+              <div id="register-strength-meter" class="password-strength-bars" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <p id="register-strength-label" class="field-note">Use 10+ characters with mixed case, numbers, and symbols.</p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="register-confirm-password">Confirm Password</label>
+            <div class="input-shell">
+              <i class="fas fa-check-circle input-icon" aria-hidden="true"></i>
+              <input type="password" id="register-confirm-password" name="confirm_password" placeholder="Repeat your password" autocomplete="new-password" required>
+              <button type="button" class="password-toggle" data-password-toggle aria-label="Toggle password visibility">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="register-otp">Email OTP</label>
+            <div class="inline-action">
+              <input type="text" id="register-otp" name="otp" placeholder="Enter the 6-digit code" inputmode="numeric" maxlength="6" required>
+              <button type="button" class="secondary-btn" id="sendOtpBtn" disabled>Send OTP</button>
+            </div>
+            <p class="field-note">The OTP will be sent to the email entered above.</p>
+          </div>
+
+          <label class="check-row" for="register-captcha">
+            <input type="checkbox" id="register-captcha" name="captcha" required>
+            <span>I am authorized to create this account and understand it may appear in audit activity.</span>
+          </label>
+
+          <button type="submit" class="primary-btn" id="registerBtn">Create Account</button>
+        </form>
+
+        <div class="panel-links">
+          <span>Already have an account?</span>
+          <a class="text-link" href="/v1/login">Sign in</a>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div id="auth-toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="{{ url_for('static', filename='v1/auth-shell.js') }}"></script>
   <script>
-    // --- THEME ---
-    const body = document.body;
-    const toggleBtn = document.querySelector('.toggle-theme');
-    const toggleIcon = toggleBtn.querySelector('i');
+    document.addEventListener("DOMContentLoaded", function () {
+      const authUi = window.FaceAPIAuth;
+      const registerForm = document.getElementById("regForm");
+      const sendOtpButton = document.getElementById("sendOtpBtn");
+      const registerButton = document.getElementById("registerBtn");
+      const registerEmailField = document.getElementById("register-email");
+      const registerPasswordField = document.getElementById("register-password");
+      let registerCooldownCancel = null;
 
-    const setTheme = (theme) => {
-      body.className = theme;
-      localStorage.setItem('theme', theme);
-      toggleIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-    };
+      authUi.bindStrengthMeter(registerPasswordField, "#register-strength-meter span", "#register-strength-label");
 
-    const initializeTheme = () => {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme) {
-        setTheme(savedTheme);
-      } else {
-        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        setTheme(prefersDark ? 'dark' : 'light');
-      }
-    };
+      registerEmailField.addEventListener("input", function () {
+        sendOtpButton.disabled = !authUi.validateEmail(registerEmailField.value.trim());
+      });
 
-    toggleBtn.addEventListener('click', () => {
-      const currentTheme = body.classList.contains('dark') ? 'light' : 'dark';
-      setTheme(currentTheme);
-    });
+      sendOtpButton.addEventListener("click", async function () {
+        const email = registerEmailField.value.trim().toLowerCase();
+        let cooldownStarted = false;
 
-    initializeTheme();
+        if (!authUi.validateEmail(email)) {
+          authUi.showToast("Enter a valid email address before requesting an OTP.", "error");
+          return;
+        }
 
-    // --- TOAST NOTIFICATIONS ---
-    function toast(msg, isError = false) {
-      const el = document.createElement('div');
-      el.className = 'toast';
-      el.innerText = msg;
-      if (isError) el.style.backgroundColor = '#ef4444';
-      document.body.append(el);
-      setTimeout(() => el.remove(), 4000);
-    }
+        const resetButton = authUi.createButtonState(sendOtpButton, "Sending...");
 
-    // --- PASSWORD VISIBILITY TOGGLE ---
-    document.querySelectorAll('.password-toggle').forEach(toggle => {
-      toggle.addEventListener('click', () => {
-        const passwordInput = toggle.previousElementSibling;
-        const icon = toggle.querySelector('i');
-        if (passwordInput.type === 'password') {
-          passwordInput.type = 'text';
-          icon.classList.remove('fa-eye');
-          icon.classList.add('fa-eye-slash');
-        } else {
-          passwordInput.type = 'password';
-          icon.classList.remove('fa-eye-slash');
-          icon.classList.add('fa-eye');
+        try {
+          const response = await fetch("/api/v1/users/send-otp", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email })
+          });
+          const payload = await response.json();
+
+          if (!response.ok) {
+            authUi.showToast(payload.message || "OTP request failed. Please try again.", "error");
+            return;
+          }
+
+          if (registerCooldownCancel) {
+            registerCooldownCancel();
+          }
+
+          cooldownStarted = true;
+          authUi.showToast(payload.message || "OTP sent successfully.", "success");
+          registerCooldownCancel = authUi.startCooldown(sendOtpButton, 30, function (remaining) {
+            return remaining > 0 ? "Resend in " + remaining + "s" : "Resend OTP";
+          });
+        } catch (_error) {
+          authUi.showToast("The platform could not send the OTP right now. Please try again.", "error");
+        } finally {
+          if (!cooldownStarted) {
+            resetButton();
+          }
         }
       });
-    });
 
-    // --- FORM LOGIC ---
-    const regForm = document.getElementById('regForm');
-    const emailField = regForm.email;
-    const passwordField = regForm.password;
-    const sendOtpBtn = document.getElementById('sendOtpBtn');
-    const strengthBars = document.querySelectorAll('.password-strength-bar');
-    const strengthText = document.getElementById('strength-text');
+      registerForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
 
-    function validateEmail(email) {
-      const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-      return re.test(String(email).toLowerCase());
-    }
+        const strength = authUi.computePasswordStrength(registerPasswordField.value);
+        const email = registerForm.email.value.trim().toLowerCase();
 
-    // --- PASSWORD STRENGTH ---
-    let passwordScore = 0;
-    passwordField.addEventListener('input', () => {
-      const pass = passwordField.value;
-      let score = 0;
-      if (pass.length > 8) score++;
-      if (/[A-Z]/.test(pass)) score++;
-      if (/[a-z]/.test(pass)) score++;
-      if (/[0-9]/.test(pass)) score++;
-      if (/[^A-Za-z0-9]/.test(pass)) score++;
-
-      passwordScore = score;
-
-      strengthBars.forEach(bar => bar.className = 'password-strength-bar');
-      strengthText.textContent = '';
-      strengthText.className = '';
-
-      if (pass.length > 0) {
-        if (score <= 2) {
-          strengthBars[0].classList.add('filled', 'weak');
-          strengthText.textContent = 'Weak';
-          strengthText.classList.add('weak');
-        } else if (score <= 4) {
-          strengthBars[0].classList.add('filled', 'medium');
-          strengthBars[1].classList.add('filled', 'medium');
-          strengthText.textContent = 'Medium';
-          strengthText.classList.add('medium');
-        } else {
-          strengthBars.forEach(b => b.classList.add('filled', 'strong'));
-          strengthText.textContent = 'Strong';
-          strengthText.classList.add('strong');
-        }
-      }
-    });
-
-    emailField.addEventListener('input', () => {
-      sendOtpBtn.disabled = !validateEmail(emailField.value);
-    });
-
-    // --- OTP ---
-    sendOtpBtn.addEventListener('click', async () => {
-      if (!validateEmail(emailField.value)) {
-        toast('Please enter a valid email address first.', true);
-        return;
-      }
-
-      // Disable button and start cooldown
-      sendOtpBtn.disabled = true;
-      let countdown = 30;
-      sendOtpBtn.innerText = `Resend in ${countdown}s`;
-
-      const interval = setInterval(() => {
-        countdown--;
-        sendOtpBtn.innerText = `Resend in ${countdown}s`;
-        if (countdown <= 0) {
-          clearInterval(interval);
-          sendOtpBtn.disabled = false;
-          sendOtpBtn.innerText = 'Resend OTP';
-        }
-      }, 1000);
-
-      try {
-        const response = await fetch('/api/v1/users/send-otp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: emailField.value })
-        });
-
-        const data = await response.json();
-
-        // Handle specific error for existing users
-        if (response.status === 409) {
-          toast(data.message || 'An account with this email already exists.', true);
-          clearInterval(interval); // Stop the timer
-          sendOtpBtn.disabled = !validateEmail(emailField.value); // Reset button state
-          sendOtpBtn.innerText = 'Send OTP';
-        } else if (response.ok) {
-          toast(data.message || `An OTP has been sent to ${emailField.value}`);
-        } else {
-          toast(data.message || 'Failed to send OTP. Please try again.', true);
-          clearInterval(interval); // Stop timer on other errors
-          sendOtpBtn.disabled = false;
-          sendOtpBtn.innerText = 'Send OTP';
+        if (!registerForm.name.value.trim()) {
+          authUi.showToast("Enter the operator name before continuing.", "error");
+          return;
         }
 
-      } catch (error) {
-        toast('A network error occurred while sending OTP. Please try again.', true);
-        clearInterval(interval); // Stop timer on network failure
-        sendOtpBtn.disabled = false;
-        sendOtpBtn.innerText = 'Send OTP';
-      }
-    });
-
-    // --- FORM SUBMISSION ---
-    regForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const { name, email, password, confirm_password, otp, captcha } = e.target.elements;
-
-      if (!validateEmail(email.value)) {
-        return toast('Please enter a valid email address.', true);
-      }
-      if (passwordScore <= 2) {
-        return toast('Password is too weak. Please choose a stronger one.', true);
-      }
-      if (password.value !== confirm_password.value) {
-        return toast('Passwords do not match.', true);
-      }
-      if (!captcha.checked) {
-        return toast('Please confirm you are not a robot.', true);
-      }
-
-      const submitBtn = regForm.querySelector('button[type="submit"]');
-      submitBtn.disabled = true;
-      submitBtn.innerText = 'Registering...';
-
-      try {
-        const res = await fetch('/api/v1/users/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: name.value,
-            email: email.value,
-            password: password.value,
-            otp: otp.value
-          })
-        });
-
-        const data = await res.json();
-        if (res.ok) {
-          toast('Registration successful! Redirecting to login...');
-          setTimeout(() => window.location.href = '/v1/login', 2000);
-        } else {
-          toast(data.message || 'Registration failed.', true);
+        if (!authUi.validateEmail(email)) {
+          authUi.showToast("Enter a valid email address before registering.", "error");
+          return;
         }
-      } catch (error) {
-        toast('An error occurred. Please try again.', true);
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = 'Register';
-      }
+
+        if (strength.score <= 2) {
+          authUi.showToast("Choose a stronger password before registration.", "error");
+          return;
+        }
+
+        if (registerForm.password.value !== registerForm.confirm_password.value) {
+          authUi.showToast("The password confirmation does not match.", "error");
+          return;
+        }
+
+        if (!/^\d{6}$/.test(registerForm.otp.value.trim())) {
+          authUi.showToast("Enter the 6-digit OTP that was sent to your email.", "error");
+          return;
+        }
+
+        if (!registerForm.captcha.checked) {
+          authUi.showToast("Complete the access acknowledgment before registering.", "error");
+          return;
+        }
+
+        const resetButton = authUi.createButtonState(registerButton, "Creating account...");
+
+        try {
+          const response = await fetch("/api/v1/users/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: registerForm.name.value.trim(),
+              email: email,
+              password: registerForm.password.value,
+              otp: registerForm.otp.value.trim()
+            })
+          });
+          const payload = await response.json();
+
+          if (!response.ok) {
+            authUi.showToast(payload.message || "Registration failed. Please review the inputs and try again.", "error");
+            return;
+          }
+
+          if (registerCooldownCancel) {
+            registerCooldownCancel();
+            registerCooldownCancel = null;
+          }
+
+          registerForm.reset();
+          sendOtpButton.disabled = true;
+          authUi.showToast("Registration complete. You can sign in now.", "success");
+          window.setTimeout(function () {
+            window.location.href = "/v1/login";
+          }, 600);
+        } catch (_error) {
+          authUi.showToast("The platform could not create the account right now. Please try again.", "error");
+        } finally {
+          resetButton();
+        }
+      });
     });
   </script>
 </body>

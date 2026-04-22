@@ -43,3 +43,12 @@ def init_mongo(app=None):
 
 def get_face_collection():
     return get_mongo_db().face_data
+
+
+def check_mongo_connection() -> tuple[bool, str | None]:
+    try:
+        get_mongo_client().admin.command("ping")
+        return True, None
+    except PyMongoError as exc:
+        logger.warning("MongoDB health check failed: {}", exc)
+        return False, str(exc)

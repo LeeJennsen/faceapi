@@ -45,6 +45,8 @@ class Config:
 
     MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/face_metadata")
     MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "face_metadata")
+    REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+    REDIS_ENABLED = _get_bool("REDIS_ENABLED", False)
 
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
     JWT_EXPIRY_SECONDS = _get_int("JWT_EXPIRY_SECONDS", 3600)
@@ -61,6 +63,10 @@ class Config:
 
     LOG_DIR = os.getenv("LOG_DIR", "logs")
     LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG" if DEBUG else "INFO").upper()
+    GRAFANA_PUBLIC_URL = os.getenv("GRAFANA_PUBLIC_URL", "http://localhost:3000")
+    PROMETHEUS_PUBLIC_URL = os.getenv("PROMETHEUS_PUBLIC_URL", "http://localhost:9090")
+    ALERTMANAGER_PUBLIC_URL = os.getenv("ALERTMANAGER_PUBLIC_URL", "http://localhost:9093")
+    LOKI_PUBLIC_URL = os.getenv("LOKI_PUBLIC_URL", "http://localhost:3100")
 
     @classmethod
     def validate_required_settings(cls) -> list[str]:

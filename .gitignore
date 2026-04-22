@@ -24,6 +24,8 @@ ENV/
 .env.*
 !.env.example
 k8s/secret.env
+k8s/overlays/shared-docker-data/shared-docker-data.env
+k8s/overlays/shared-docker-data/shared-docker-data.secrets.env
 charts/faceapi2/values.secrets.local.yaml
 k8s/*.local.yaml
 charts/faceapi2/values.local.yaml

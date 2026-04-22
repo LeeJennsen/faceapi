@@ -7,12 +7,20 @@ from datetime import datetime
 import requests # For cloud api 
 import logging
 from logging.handlers import RotatingFileHandler
+from urllib.parse import urlsplit, urlunsplit
 
 # Broker / API settings
 broker = os.getenv("MQTT_HOST", "mqtt")
 port = int(os.getenv("MQTT_PORT", "1883"))
 topic = os.getenv("FACE_DATA_TOPIC", "face/data/raw")
-api_base_url = os.getenv("FACE_API_BASE_URL", "http://api:5000").rstrip("/")
+api_base_url = os.getenv("FACE_API_BASE_URL", "http://host.docker.internal:5000").rstrip("/")
+api_timeout_seconds = float(os.getenv("FACE_API_TIMEOUT_SECONDS", "10"))
+default_api_base_urls = (
+    "http://host.docker.internal:5000",
+    "http://localhost:5000",
+    "http://nginx:80",
+    "http://api:5000",
+)
 
 # Set up logging
 os.makedirs("logs", exist_ok=True)
@@ -41,6 +49,51 @@ CONNACK_NAMES = {
     4: "Refused: Bad Credentials",
     5: "Refused: Not Authorized"
 }
+
+
+def normalize_api_base_url(raw_url):
+    value = (raw_url or "").strip()
+    if not value:
+        return None
+
+    if "://" not in value:
+        value = f"http://{value}"
+
+    try:
+        parsed = urlsplit(value)
+    except ValueError:
+        return None
+
+    hostname = parsed.hostname
+    if not hostname:
+        return None
+
+    port = parsed.port
+    if port is None:
+        if hostname in {"host.docker.internal", "localhost", "127.0.0.1"}:
+            port = 5000
+        elif hostname == "nginx":
+            port = 80
+        elif hostname == "api":
+            port = 5000
+
+    netloc = hostname if port is None else f"{hostname}:{port}"
+    path = parsed.path.rstrip("/")
+    return urlunsplit((parsed.scheme or "http", netloc, path, "", "")).rstrip("/")
+
+
+def get_api_base_url_candidates():
+    candidates = []
+    seen = set()
+
+    for raw_url in (api_base_url, *default_api_base_urls):
+        normalized = normalize_api_base_url(raw_url)
+        if not normalized or normalized in seen:
+            continue
+        seen.add(normalized)
+        candidates.append(normalized)
+
+    return candidates
 
 # Callback when connected to broker
 def on_connect(client, userdata, flags, reasonCode, properties=None):
@@ -109,22 +162,24 @@ def save_received_data(data, folder="data"):
 
 # Function for forwarding face data to cloud API
 def forward_to_api(data):
-    try:
-        url = f"{api_base_url}/api/v1/faces-mongo/"
-        headers = {"Content-Type": "application/json"} # Specify that we're sending JSON
-        response = requests.post(url, json=data)
-        #headers = {"Authorization": f"Bearer {your_jwt_token}"} # Replace with real JWT credentials
-        #response = requests.post(url, json=data, headers=headers)
+    for base_url in get_api_base_url_candidates():
+        url = f"{base_url}/api/v1/faces-mongo/"
+        try:
+            response = requests.post(url, json=data, timeout=api_timeout_seconds)
+            if response.status_code == 200:
+                logger.info("Forwarded to API successfully via %s", base_url)
+                return True
 
-        if response.status_code == 200:
-            logger.info("Forwarded to API successfully")
-            return True
-        else:
-            logger.error("API forward failed - Status: %d, Response: %s", response.status_code, response.text)
-            return False
-    except Exception as e:
-        logger.exception("Exception during API forward")
-        return False
+            logger.warning(
+                "API forward via %s failed - Status: %d, Response: %s",
+                base_url,
+                response.status_code,
+                response.text,
+            )
+        except requests.RequestException as exc:
+            logger.warning("API forward via %s failed: %s", base_url, exc)
+
+    return False
 
 def main():
     # Create mqtt client

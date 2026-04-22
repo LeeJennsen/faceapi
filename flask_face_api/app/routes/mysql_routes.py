@@ -1,3 +1,6 @@
+import json
+from datetime import datetime, timezone
+
 from flask import request
 from flask_restx import Namespace, Resource, fields
 from loguru import logger
@@ -46,6 +49,29 @@ full_record_model = mysql_ns.model(
 
 def _request_json():
     return request.get_json(silent=True) or {}
+
+
+def _normalize_embedding_for_db(value):
+    if isinstance(value, str):
+        return value
+    if hasattr(value, "tolist"):
+        return json.dumps(value.tolist())
+    return json.dumps(value)
+
+
+def _normalize_timestamp_for_db(value):
+    if not isinstance(value, str):
+        return value
+
+    normalized = value.strip().replace("Z", "+00:00")
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError:
+        return value
+
+    if parsed.tzinfo is not None:
+        parsed = parsed.astimezone(timezone.utc).replace(tzinfo=None)
+    return parsed.strftime("%Y-%m-%d %H:%M:%S")
 
 
 def _serialize_person_row(row):
@@ -151,8 +177,8 @@ class FaceTrackingResource(Resource):
                         data["track_id"],
                         data.get("unique_id"),
                         data["image_base64"],
-                        data["embedding"],
-                        data["timestamp"],
+                        _normalize_embedding_for_db(data["embedding"]),
+                        _normalize_timestamp_for_db(data["timestamp"]),
                         data.get("camera_id"),
                         data.get("custom_track_key"),
                     ),
@@ -197,8 +223,8 @@ class FullFaceRecordResource(Resource):
                         tracking_data["track_id"],
                         tracking_data.get("unique_id"),
                         tracking_data["image_base64"],
-                        tracking_data["embedding"],
-                        tracking_data["timestamp"],
+                        _normalize_embedding_for_db(tracking_data["embedding"]),
+                        _normalize_timestamp_for_db(tracking_data["timestamp"]),
                         tracking_data.get("camera_id"),
                         tracking_data.get("custom_track_key"),
                     ),
